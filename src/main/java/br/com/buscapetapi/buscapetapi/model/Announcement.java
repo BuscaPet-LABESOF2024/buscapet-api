@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @Data
@@ -20,7 +21,7 @@ public class Announcement {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "announcement_id_sequence")
     @SequenceGenerator(sequenceName = "announcement_id_sequence", allocationSize = 1, name = "announcement_id_sequence")
-    private int id;
+    private Long id;
 
     @Size(max = 50)
     @NotNull
@@ -56,9 +57,9 @@ public class Announcement {
     private boolean active;
 
     @Column(name = "created_at")
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
 
 }
