@@ -41,12 +41,16 @@ public class User {
     @Column(name = "password", length = 150)
     private String password;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
-    private int address;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "id")
+//    private int address;
+
+    @Column(name = "address")
+    private Integer address;
 
     @Column(name = "created_at")
     private LocalDate createdAt;
+
 
     @Column(name = "updated_at")
     private LocalDate updatedAt;

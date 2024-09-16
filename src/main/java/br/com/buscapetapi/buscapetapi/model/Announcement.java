@@ -41,15 +41,15 @@ public class Announcement {
     private String contactEmail;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "animal_id")
+    @JoinColumn(name = "animal")
     private Animal animal;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "announcement_type_id")
+    @JoinColumn(name = "announcement_type")
     private AnnouncementType announcementType;
 
     @NotNull
