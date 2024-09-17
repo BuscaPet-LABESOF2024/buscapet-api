@@ -22,7 +22,7 @@ public class AnimalController {
         return ResponseEntity.ok(createdAnimal);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update-animal")
     public ResponseEntity<Animal> updateAnimal(@Valid @RequestBody Animal animalInput) {
         Animal updatedAnimal = animalService.updateAnimal(animalInput);
         return ResponseEntity.ok(updatedAnimal);

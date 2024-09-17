@@ -18,8 +18,7 @@ import java.time.LocalDateTime;
 public class Animal {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "animal_id_sequence")
-    @SequenceGenerator(sequenceName = "animal_id_sequence", allocationSize = 1, name = "animal_id_sequence")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Size(max = 50)
@@ -42,9 +41,8 @@ public class Animal {
     private String breed;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "size", length = 10)
-    private SizeAnimal size;
+    @Column(name = "size_animal", length = 10)
+    private Integer size;
 
     @NotNull
     @Column(name = "weight", precision = 5, scale = 2)
@@ -60,8 +58,4 @@ public class Animal {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Enum SizeAnimal substituindo Size
-    public enum SizeAnimal {
-        SMALL, MEDIUM, LARGE;
-    }
 }

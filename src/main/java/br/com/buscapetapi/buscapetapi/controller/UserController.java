@@ -23,7 +23,7 @@ public class UserController {
         return ResponseEntity.ok(createdUser);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update-user")
     public ResponseEntity<User> updateUser(@Valid @RequestBody User userInput){
         User updatedUser = userService.updateUser(userInput);
         return ResponseEntity.ok(updatedUser);
