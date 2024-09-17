@@ -9,11 +9,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "announcement_type")
-public class AnnouncementType {
-
+@Table(name = "image_announcement")
+public class ImageAnnouncement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private String description;
+    private Long id;
+
+    @Lob
+    private byte[] image;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "announcement", nullable = false)
+    private Announcement announcement;
 }

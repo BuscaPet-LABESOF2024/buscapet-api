@@ -19,8 +19,7 @@ import java.time.LocalDateTime;
 public class Announcement {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "announcement_id_sequence")
-    @SequenceGenerator(sequenceName = "announcement_id_sequence", allocationSize = 1, name = "announcement_id_sequence")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Size(max = 50)
