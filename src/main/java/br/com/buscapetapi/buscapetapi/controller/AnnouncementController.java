@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/announcements")
+@RequestMapping("/announcement")
 public class AnnouncementController {
     private final AnnouncementService announcementService;
 
@@ -27,7 +27,7 @@ public class AnnouncementController {
         return ResponseEntity.ok(updatedAnnouncement);
     }
 
-    @GetMapping("announcements/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Announcement> getAnnouncement(@PathVariable Long id) {
         Announcement announcement = announcementService.findById(id);
         return ResponseEntity.ok(announcement);

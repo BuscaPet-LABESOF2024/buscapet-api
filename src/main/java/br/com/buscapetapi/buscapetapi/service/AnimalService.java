@@ -1,6 +1,7 @@
 package br.com.buscapetapi.buscapetapi.service;
 
 import br.com.buscapetapi.buscapetapi.model.Animal;
+import br.com.buscapetapi.buscapetapi.model.Announcement;
 import br.com.buscapetapi.buscapetapi.repository.AnimalRepository;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +27,7 @@ public class AnimalService {
         Optional<Animal> existingAnimal = animalRepository.findById(id);
 
         if (existingAnimal.isPresent()) {
-            Animal animal = existingAnimal.get();
-            return animal;
+            return existingAnimal.get();
         }
         return null;
     }
