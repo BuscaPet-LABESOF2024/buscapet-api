@@ -27,8 +27,7 @@ public class UserService {
         Optional<User> existingUser = userRepository.findById(id);
 
         if (existingUser.isPresent()){
-            User user = existingUser.get();
-            return user;
+            return existingUser.get();
         }
         return null;
     }
