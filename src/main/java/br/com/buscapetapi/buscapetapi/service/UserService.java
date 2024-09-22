@@ -2,19 +2,32 @@ package br.com.buscapetapi.buscapetapi.service;
 
 import br.com.buscapetapi.buscapetapi.model.User;
 import br.com.buscapetapi.buscapetapi.repository.UserRepository;
-import org.springframework.data.crossstore.ChangeSetPersister;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.security.Key;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
+
+import static javax.crypto.Cipher.SECRET_KEY;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private EmailService emailService;
 
-    public UserService(UserRepository userRepository){
+    @Value("${JWT_SECRET}")
+    private String secretKey;
+
+    public UserService(UserRepository userRepository, EmailService emailService) {
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
     public User createUser(User userInput){
@@ -47,5 +60,27 @@ public class UserService {
 
         }
         return userRepository.save(userInput);
+    }
+
+    public String generateToken(String email) {
+        // Gera uma chave segura para HS256
+        Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 dia
+                .signWith(key)
+                .compact();
+    }
+
+
+    public boolean authenticate(String email, String password) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            // Verifique a senha. Idealmente, deve estar criptografada.
+            return user.get().getPassword().equals(password);
+
+        }
+        return false;
     }
 }

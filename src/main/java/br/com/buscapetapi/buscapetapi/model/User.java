@@ -40,6 +40,11 @@ public class User {
     @Column(name = "password", length = 150)
     private String password;
 
+    @Size(max = 150)
+    @Column(name = "reset_token", length = 150)
+    private String resetToken;
+
+
 //    @OneToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "id")
 //    private int address;
