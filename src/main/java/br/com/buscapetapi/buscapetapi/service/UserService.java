@@ -73,7 +73,6 @@ public class UserService {
                 .compact();
     }
 
-
     public boolean authenticate(String email, String password) {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent()) {
@@ -83,4 +82,26 @@ public class UserService {
         }
         return false;
     }
+
+    public void forgotPassword(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            String token = UUID.randomUUID().toString();
+            User existingUser = user.get();
+            existingUser.setResetToken(token);
+            userRepository.save(existingUser);
+            emailService.sendResetPasswordEmail(email, token);
+        }
+    }
+
+    public Optional<User> findByResetToken(String token) {
+        return userRepository.findByResetToken(token);
+    }
+
+    public void updatePassword(User user, String newPassword) {
+        user.setPassword(newPassword);  // Criptografe a senha se necessário
+        user.setResetToken(null);  // Limpa o token após o uso
+        userRepository.save(user);
+    }
+
 }
