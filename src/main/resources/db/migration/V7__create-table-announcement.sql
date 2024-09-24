@@ -9,7 +9,7 @@ CREATE TABLE `announcement` (
     `announcement_type` int unsigned,
     `active` tinyint,
     `created_at` datetime,
-    `updated_at` datetime on update current_timestamp ,
+    `updated_at` datetime on update current_timestamp,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`animal`) REFERENCES `animal`(`id`),
     FOREIGN KEY (`announcement_type`) REFERENCES `announcement_type`(`id`),
