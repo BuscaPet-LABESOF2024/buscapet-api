@@ -48,7 +48,7 @@ public class UserService {
     public User updateUser(User userInput){
         Optional<User> existingUser = userRepository.findById(userInput.getId());
 
-        if (existingUser.isPresent()){
+        if (existingUser.isPresent()) {
             User user = existingUser.get();
 
             user.setName(userInput.getName());

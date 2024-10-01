@@ -57,5 +57,4 @@ public class Animal {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
 }
