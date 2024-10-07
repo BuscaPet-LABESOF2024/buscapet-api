@@ -31,7 +31,7 @@ spring.datasource.password=${DB_PASSWORD} </code> <br>
 - Altere ${DB_USERNAME} para o nome de usuário do seu banco de dados. <br>
 - Altere ${DB_PASSWORD} para a senha do seu banco de dados.
 
-**4. Rode a aplicação** <br>
+**4. Rode a aplicação <br><br>**
 - Para isso, abra o arquivo BuscaPetApiApplication.java. <br>
 - Clique no botão Run e execute o projeto. (Shift + 10 é o atalho para executar o projeto.)
 - Ao ser executado o projeto, a aplicação roda todas as migrações presentes relacionadas ao banco de dados.
