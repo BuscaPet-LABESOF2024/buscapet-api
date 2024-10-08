@@ -1,7 +1,9 @@
 package br.com.buscapetapi.buscapetapi.service;
 
+import br.com.buscapetapi.buscapetapi.dto.input.AdoptionAnnouncementInput;
 import br.com.buscapetapi.buscapetapi.model.Announcement;
 import br.com.buscapetapi.buscapetapi.repository.AnnouncementRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -10,15 +12,26 @@ import java.util.Optional;
 @Service
 public class AnnouncementService {
     private final AnnouncementRepository announcementRepository;
+    private final ModelMapper modelMapper;
 
-    public AnnouncementService(AnnouncementRepository announcementRepository) {
+
+    public AnnouncementService(AnnouncementRepository announcementRepository, ModelMapper modelMapper) {
         this.announcementRepository = announcementRepository;
+        this.modelMapper = modelMapper;
     }
 
     public Announcement createAnnouncement(Announcement announcementInput) {
         announcementInput.setCreatedAt(LocalDateTime.now());
         announcementInput.setUpdatedAt(LocalDateTime.now());
         return announcementRepository.save(announcementInput);
+    }
+
+    public Announcement createAdoptionAnnoucement(AdoptionAnnouncementInput announcementInput){
+        Announcement announcement = modelMapper.map(announcementInput, Announcement.class);
+        announcement.setContactEmail(announcementInput.getUser().getEmail());
+        announcement.setCreatedAt(LocalDateTime.now());
+        announcement.setUpdatedAt(LocalDateTime.now());
+        return announcementRepository.save(announcement);
     }
 
     public Announcement findById(Long id) {

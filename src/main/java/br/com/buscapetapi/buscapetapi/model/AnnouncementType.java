@@ -14,6 +14,6 @@ public class AnnouncementType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id; //Coloquei como Long pro JPARepository funcionar
     private String description;
 }
