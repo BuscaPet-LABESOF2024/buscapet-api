@@ -36,6 +36,7 @@ public class UserService {
 
     public User createUser(UserRegistrationInput userInput){
 
+
         User user = modelMapper.map(userInput, User.class);
 
         user.setCreatedAt(LocalDate.now());
