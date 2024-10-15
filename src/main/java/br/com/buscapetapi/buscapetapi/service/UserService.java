@@ -25,9 +25,6 @@ public class UserService {
     private final ModelMapper modelMapper;
     private EmailService emailService;
 
-    @Value("${JWT_SECRET}")
-    private String secretKey;
-
     public UserService(UserRepository userRepository, EmailService emailService, ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.emailService = emailService;
