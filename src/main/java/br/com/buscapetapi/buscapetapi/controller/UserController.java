@@ -1,5 +1,6 @@
 package br.com.buscapetapi.buscapetapi.controller;
 
+import br.com.buscapetapi.buscapetapi.dto.input.UserRegistrationInput;
 import br.com.buscapetapi.buscapetapi.model.User;
 import br.com.buscapetapi.buscapetapi.service.UserService;
 import jakarta.validation.Valid;
@@ -21,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping("/new-account")
-    public ResponseEntity<User> createUser (@Valid @RequestBody User userInput){
+    public ResponseEntity<User> createUser (@Valid @RequestBody UserRegistrationInput userInput){
         User createdUser = userService.createUser(userInput);
         return ResponseEntity.ok(createdUser);
     }
