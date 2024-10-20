@@ -23,7 +23,8 @@ Durante o desenvolvimento, nós utilizamos o IntelliJ, por isso o recomendamos.
 
 **3. Adicionando o banco de dados**<br><br>
 Com o projeto aberto, abra o arquivo **application.properties** e adicione os dados do seu banco de dados. <br><br>
-<code> spring.datasource.url=${DB_URL}
+<code> 
+spring.datasource.url=${DB_URL}
 spring.datasource.username=${DB_USERNAME}
 spring.datasource.password=${DB_PASSWORD} </code> <br>
 
