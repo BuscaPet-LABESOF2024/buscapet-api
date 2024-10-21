@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Data
@@ -50,6 +51,9 @@ public class Announcement {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "announcement_type")
     private AnnouncementType announcementType;
+
+    @OneToMany(mappedBy = "announcement", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ImageAnnouncement> images; // Relação com ImageAnnouncement
 
     @NotNull
     @Column(name = "active")
