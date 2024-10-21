@@ -28,5 +28,6 @@ public class ImageAnnouncement {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "announcement", nullable = false)
-    private Announcement announcement;
+    private Announcement announcement; // Relacionamento com Announcement
+
 }
