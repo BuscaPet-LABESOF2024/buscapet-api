@@ -43,19 +43,33 @@ public class AnnouncementController {
     }
 
     @PostMapping("new-adoption-announcement")
-    public ResponseEntity<?> createAdoptionAnnouncement(@Valid @RequestBody AdoptionAnnouncementInput announcementInput){
+    public ResponseEntity<?> createAdoptionAnnouncement(@Valid @RequestBody AdoptionAnnouncementInput announcementInput) {
+
         Animal newAnimal = animalService.createAnimal(announcementInput.getAnimal());
         User user = userService.findById(announcementInput.getUser().getId());
         AnnouncementType announcementType = annoucementTypeService.findById(announcementInput.getAnnouncementType().getId());
 
+        // Ajusta o anúncio de adoção com os objetos corretos
         announcementInput.setAnimal(newAnimal);
         announcementInput.setUser(user);
         announcementInput.setAnnouncementType(announcementType);
 
+        // Cria o anúncio de adoção
         Announcement createdAdoptionAnnouncement = announcementService.createAdoptionAnnoucement(announcementInput);
-        AdoptionAnnouncementOutput adoption = modelMapper.map(createdAdoptionAnnouncement, AdoptionAnnouncementOutput.class);
+
+        // Mapeia o anúncio criado para o formato de saída
+        AdoptionAnnouncementOutput adoption = new AdoptionAnnouncementOutput();
+        adoption.setTitle(createdAdoptionAnnouncement.getTitle());
+        adoption.setDescription(createdAdoptionAnnouncement.getDescription());
+        adoption.setAnimal(createdAdoptionAnnouncement.getAnimal().getId());
+        adoption.setAnnouncementType(createdAdoptionAnnouncement.getAnnouncementType().getId());
+        adoption.setContactPhone(createdAdoptionAnnouncement.getContactPhone());
+        adoption.setUser(createdAdoptionAnnouncement.getUser().getId());
+        adoption.setActive(true);
+
         return ResponseEntity.ok(adoption);
     }
+
 
     @PutMapping("/update-announcement")
     public ResponseEntity<Announcement> updateAnnouncement(@Valid @RequestBody Announcement announcementInput) {

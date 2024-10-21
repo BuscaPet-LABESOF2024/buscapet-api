@@ -14,4 +14,5 @@ public class AdoptionAnnouncementOutput {
     private Long announcementType;
     private String contactPhone;
     private Long user;
+    private boolean active;
 }
