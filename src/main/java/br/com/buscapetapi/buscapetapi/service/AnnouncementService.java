@@ -2,13 +2,11 @@ package br.com.buscapetapi.buscapetapi.service;
 
 import br.com.buscapetapi.buscapetapi.dto.input.AdoptionAnnouncementInput;
 import br.com.buscapetapi.buscapetapi.dto.input.AnimalInput;
+import br.com.buscapetapi.buscapetapi.dto.input.ImageAnnouncementInput;
 import br.com.buscapetapi.buscapetapi.dto.output.AdoptionAnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.AnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.ImageAnnouncementOutput;
-import br.com.buscapetapi.buscapetapi.model.Animal;
-import br.com.buscapetapi.buscapetapi.model.Announcement;
-import br.com.buscapetapi.buscapetapi.model.AnnouncementType;
-import br.com.buscapetapi.buscapetapi.model.User;
+import br.com.buscapetapi.buscapetapi.model.*;
 import br.com.buscapetapi.buscapetapi.repository.AnnouncementRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -25,18 +23,21 @@ public class AnnouncementService {
     private final AnimalService animalService;
     private final UserService userService;
     private final AnnoucementTypeService annoucementTypeService;
+    private final ImageAnnouncementService imageAnnouncementService;
 
 
     public AnnouncementService(AnnouncementRepository announcementRepository,
                                ModelMapper modelMapper,
                                AnimalService animalService,
                                UserService userService,
-                               AnnoucementTypeService annoucementTypeService) {
+                               AnnoucementTypeService annoucementTypeService,
+                               ImageAnnouncementService imageAnnouncementService) {
         this.announcementRepository = announcementRepository;
         this.modelMapper = modelMapper;
         this.animalService = animalService;
         this.userService = userService;
         this.annoucementTypeService = annoucementTypeService;
+        this.imageAnnouncementService = imageAnnouncementService;
     }
 
     public Announcement createAnnouncement(Announcement announcementInput) {
@@ -46,7 +47,7 @@ public class AnnouncementService {
     }
 
     public AdoptionAnnouncementOutput createAdoptionAnnouncement(AdoptionAnnouncementInput announcementInput) {
-        // Criação do animal e busca pelo tipo de anúncio
+
         Animal newAnimal = animalService.createAnimal(announcementInput.getAnimal());
         AnnouncementType announcementType = annoucementTypeService.findById(announcementInput.getAnnouncementType().getId());
         User user = userService.findById(announcementInput.getUserId());
@@ -71,6 +72,9 @@ public class AnnouncementService {
         adoptionOutput.setContactPhone(createdAnnouncement.getContactPhone());
         adoptionOutput.setUser(createdAnnouncement.getUser().getId());
         adoptionOutput.setActive(true);
+
+        // Acrescenta o id do anuncio já criado a imagem
+        ImageAnnouncement image = imageAnnouncementService.createImageAnnouncement(announcementInput.getImageAnnouncement(), createdAnnouncement.getId());
 
         return adoptionOutput;
     }
@@ -122,9 +126,10 @@ public class AnnouncementService {
         output.setContactEmail(announcement.getContactEmail());
         output.setCreatedAt(announcement.getCreatedAt());
         output.setUpdatedAt(announcement.getUpdatedAt());
-        output.setImages(announcement.getImages().stream()
-                .map(image -> new ImageAnnouncementOutput(image.getId(), image.getImage()))
-                .collect(Collectors.toList()));
+        //tá dando erro agora que a image é string
+//        output.setImages(announcement.getImages().stream()
+//                .map(image -> new ImageAnnouncementOutput(image.getId(), image.getImage()))
+//                .collect(Collectors.toList()));
         return output;
     }
 
