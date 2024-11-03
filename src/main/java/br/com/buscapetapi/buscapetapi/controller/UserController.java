@@ -20,19 +20,9 @@ import java.util.Optional;
 @RequestMapping("user")
 public class UserController {
     private final UserService userService;
-    private final ModelMapper modelMapper;
 
-    public UserController(UserService userService,
-                          ModelMapper modelMapper) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.modelMapper = modelMapper;
-    }
-
-    @PostMapping("/new-account")
-    public ResponseEntity<UserRegistrationOutput> createUser (@Valid @RequestBody UserRegistrationInput userInput){
-        User createdUser = userService.createUser(userInput);
-        UserRegistrationOutput user = modelMapper.map(createdUser, UserRegistrationOutput.class);
-        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/update-user")

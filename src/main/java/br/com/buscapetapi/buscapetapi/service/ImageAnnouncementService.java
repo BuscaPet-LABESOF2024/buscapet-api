@@ -33,10 +33,8 @@ public class ImageAnnouncementService {
     public ImageAnnouncement findById(Long id) {
         Optional<ImageAnnouncement> existingImageAnnouncement = imageAnnouncementRepository.findById(id);
 
-        if (existingImageAnnouncement.isPresent()) {
-            return existingImageAnnouncement.get();
-        }
-        return null;  // ou você pode lançar uma exceção personalizada aqui
+        // ou você pode lançar uma exceção personalizada aqui
+        return existingImageAnnouncement.orElse(null);
     }
 
     public ImageAnnouncement updateImageAnnouncement(ImageAnnouncement imageAnnouncementInput) {

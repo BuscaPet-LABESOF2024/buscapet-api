@@ -8,8 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 public class BuscaPetApiApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(BuscaPetApiApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(BuscaPetApiApplication.class, args);
+    }
 }

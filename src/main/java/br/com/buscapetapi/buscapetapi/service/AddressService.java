@@ -30,10 +30,7 @@ public class AddressService {
     public Address findById(Long id) {
         Optional<Address> existingAddress = addressRepository.findById(id);
 
-        if (existingAddress.isPresent()) {
-            return existingAddress.get();
-        }
-        return null;
+        return existingAddress.orElse(null);
     }
 
     public Address updateAddress(AddressInput addressInput) {

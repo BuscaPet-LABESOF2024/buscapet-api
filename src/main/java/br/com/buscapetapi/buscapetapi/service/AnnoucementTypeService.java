@@ -18,9 +18,6 @@ public class AnnoucementTypeService {
     public AnnouncementType findById(Long id){
         Optional<AnnouncementType> existingAnnoucementType = announcementTypeRepository.findById(id);
 
-        if (existingAnnoucementType.isPresent()){
-            return existingAnnoucementType.get();
-        }
-        return null;
+        return existingAnnoucementType.orElse(null);
     }
 }
