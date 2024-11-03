@@ -1,8 +1,11 @@
 package br.com.buscapetapi.buscapetapi.controller;
 
+import br.com.buscapetapi.buscapetapi.dto.input.AddressInput;
+import br.com.buscapetapi.buscapetapi.dto.output.AddressOutput;
 import br.com.buscapetapi.buscapetapi.model.Address;
 import br.com.buscapetapi.buscapetapi.service.AddressService;
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,21 +14,26 @@ import org.springframework.web.bind.annotation.*;
 public class AddressController {
 
     private final AddressService addressService;
+    private final ModelMapper modelMapper;
 
-    public AddressController(AddressService addressService) {
+    public AddressController(AddressService addressService, ModelMapper modelMapper) {
         this.addressService = addressService;
+        this.modelMapper = modelMapper;
     }
 
     @PostMapping("/new-address")
-    public ResponseEntity<Address> createAddress(@Valid @RequestBody Address addressInput) {
+    public ResponseEntity<AddressOutput> createAddress(@Valid @RequestBody AddressInput addressInput) {
         Address createdAddress = addressService.createAddress(addressInput);
-        return ResponseEntity.ok(createdAddress);
+        AddressOutput addressOutput = modelMapper.map(createdAddress, AddressOutput.class);
+        return ResponseEntity.ok(addressOutput);
     }
 
     @PutMapping("/update-address")
-    public ResponseEntity<Address> updateAddress(@Valid @RequestBody Address addressInput) {
+    public ResponseEntity<AddressOutput> updateAddress(@Valid @RequestBody AddressInput addressInput) {
         Address updatedAddress = addressService.updateAddress(addressInput);
-        return ResponseEntity.ok(updatedAddress);
+        AddressOutput addressOutput = modelMapper.map(updatedAddress, AddressOutput.class);
+
+        return ResponseEntity.ok(addressOutput);
     }
 
     @GetMapping("/{id}")

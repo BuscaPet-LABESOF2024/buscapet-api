@@ -1,6 +1,10 @@
 package br.com.buscapetapi.buscapetapi.service;
 
+import br.com.buscapetapi.buscapetapi.dto.input.AddressInput;
+import br.com.buscapetapi.buscapetapi.dto.input.UserInput;
 import br.com.buscapetapi.buscapetapi.dto.input.UserRegistrationInput;
+import br.com.buscapetapi.buscapetapi.dto.output.UserOutput;
+import br.com.buscapetapi.buscapetapi.model.Address;
 import br.com.buscapetapi.buscapetapi.model.User;
 import br.com.buscapetapi.buscapetapi.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,13 +27,18 @@ import static javax.crypto.Cipher.SECRET_KEY;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AddressService addressService;
     private final ModelMapper modelMapper;
     private EmailService emailService;
 
-    public UserService(UserRepository userRepository, EmailService emailService, ModelMapper modelMapper) {
+    public UserService(UserRepository userRepository,
+                       EmailService emailService,
+                       ModelMapper modelMapper,
+                       AddressService addressService) {
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.modelMapper = modelMapper;
+        this.addressService = addressService;
     }
 
     public User createUser(UserRegistrationInput userInput){
@@ -49,22 +59,55 @@ public class UserService {
         return null;
     }
 
-    public User updateUser(User userInput){
+    public UserOutput updateUser(UserInput userInput) {
         Optional<User> existingUser = userRepository.findById(userInput.getId());
-
+        User user = null;
         if (existingUser.isPresent()) {
-            User user = existingUser.get();
+            user = existingUser.get();
 
             user.setName(userInput.getName());
-            user.setPassword(userInput.getPassword());
-            user.setAddress(userInput.getAddress());
+            user.setEmail(userInput.getEmail());
             user.setPhone(userInput.getPhone());
-            user.setCreatedAt(userInput.getCreatedAt());
+
+            // Atualizar ou criar endereço do usuário
+            AddressInput addressInput = new AddressInput();
+            addressInput.setId(userInput.getAddressId());
+            addressInput.setStreet(userInput.getStreet());
+            addressInput.setNumber(userInput.getNumber());
+            addressInput.setNeighborhood(userInput.getNeighborhood());
+            addressInput.setCep(userInput.getCep());
+            addressInput.setUpdatedAt(LocalDateTime.now());
+            addressInput.setReferencia(userInput.getReferencia());
+            addressInput.setComplemento(userInput.getComplemento());
+
+            if (userInput.getAddressId() == null) {
+                // Cria um novo endereço e captura o ID gerado
+                Address newAddress = addressService.createAddress(addressInput);
+                user.setAddress(newAddress.getId());
+            } else {
+                // Atualiza o endereço existente
+                Address updatedAddress = addressService.updateAddress(addressInput);
+                if (updatedAddress != null) {
+                    user.setAddress(updatedAddress.getId());
+                }
+            }
+
+            user.setPassword(userInput.getPassword());
             user.setUpdatedAt(LocalDate.now());
 
+            // Salva o usuário atualizado no repositório
+            user = userRepository.save(user);
         }
-        return userRepository.save(userInput);
+
+        // Mapeia o objeto `User` atualizado para `UserOutput`
+        UserOutput userOutput = modelMapper.map(user, UserOutput.class);
+
+        // Ajusta manualmente os campos que possam não estar corretamente mapeados
+        userOutput.setAddressId(user.getAddress()); // Mapeia o ID do endereço para o output
+        return userOutput;
     }
+
+
 
     public String generateToken(String email) {
         // Gera uma chave segura para HS256
