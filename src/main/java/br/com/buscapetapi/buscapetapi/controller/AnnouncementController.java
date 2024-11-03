@@ -2,9 +2,9 @@ package br.com.buscapetapi.buscapetapi.controller;
 
 import br.com.buscapetapi.buscapetapi.dto.input.AdoptionAnnouncementInput;
 import br.com.buscapetapi.buscapetapi.dto.input.AnimalInput;
-import br.com.buscapetapi.buscapetapi.dto.output.AdoptionAnnouncementOutput;
-import br.com.buscapetapi.buscapetapi.dto.output.AnnouncementOutput;
-import br.com.buscapetapi.buscapetapi.dto.output.ImageAnnouncementOutput;
+import br.com.buscapetapi.buscapetapi.dto.input.FoundAnnouncementInput;
+import br.com.buscapetapi.buscapetapi.dto.input.LostAnnouncementInput;
+import br.com.buscapetapi.buscapetapi.dto.output.*;
 import br.com.buscapetapi.buscapetapi.model.Animal;
 import br.com.buscapetapi.buscapetapi.model.Announcement;
 import br.com.buscapetapi.buscapetapi.model.AnnouncementType;
@@ -48,6 +48,30 @@ public class AnnouncementController {
                 announcementService.createAdoptionAnnouncement(announcementInput);
 
         return ResponseEntity.ok(createdAdoption);
+    }
+
+    @PostMapping("new-found-announcement")
+    public ResponseEntity<FoundAnnouncementOutput> createFoundAnnouncement(
+            @Valid @RequestBody FoundAnnouncementInput announcementInput) {
+
+        // Chamando o serviço para criar o anúncio de adoção
+        FoundAnnouncementOutput createdAnnouncement =
+                announcementService.createFoundAnnouncement(announcementInput);
+
+        return ResponseEntity.ok(createdAnnouncement);
+    }
+
+    @PostMapping("new-lost-announcement")
+    public ResponseEntity<LostAnnouncementOutput> createLostAnnouncement(
+            @Valid @RequestBody LostAnnouncementInput announcementInput) {
+        FoundAnnouncementInput announcement = modelMapper.map(announcementInput, FoundAnnouncementInput.class);
+
+        // Chamando o serviço para criar o anúncio de adoção
+        FoundAnnouncementOutput createdAdoption =
+                announcementService.createFoundAnnouncement(announcement);
+        LostAnnouncementOutput output = modelMapper.map(createdAdoption, LostAnnouncementOutput.class);
+
+        return ResponseEntity.ok(output);
     }
 
     @PutMapping("/update-announcement")

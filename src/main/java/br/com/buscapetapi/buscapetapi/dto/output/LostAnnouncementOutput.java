@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class FoundAnnouncementOutput {
+public class LostAnnouncementOutput {
     private String title;
     private String description;
     private LocalDate data;

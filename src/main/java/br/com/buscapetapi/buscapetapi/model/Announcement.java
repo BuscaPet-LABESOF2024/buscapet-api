@@ -65,4 +65,11 @@ public class Announcement {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "data")
+    private LocalDate data;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address")
+    private Address address;
+
 }

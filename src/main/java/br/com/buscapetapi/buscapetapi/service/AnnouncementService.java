@@ -1,10 +1,9 @@
 package br.com.buscapetapi.buscapetapi.service;
 
-import br.com.buscapetapi.buscapetapi.dto.input.AdoptionAnnouncementInput;
-import br.com.buscapetapi.buscapetapi.dto.input.AnimalInput;
-import br.com.buscapetapi.buscapetapi.dto.input.ImageAnnouncementInput;
+import br.com.buscapetapi.buscapetapi.dto.input.*;
 import br.com.buscapetapi.buscapetapi.dto.output.AdoptionAnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.AnnouncementOutput;
+import br.com.buscapetapi.buscapetapi.dto.output.FoundAnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.ImageAnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.model.*;
 import br.com.buscapetapi.buscapetapi.repository.AnnouncementRepository;
@@ -24,6 +23,7 @@ public class AnnouncementService {
     private final UserService userService;
     private final AnnoucementTypeService annoucementTypeService;
     private final ImageAnnouncementService imageAnnouncementService;
+    private final AddressService addressService;
 
 
     public AnnouncementService(AnnouncementRepository announcementRepository,
@@ -31,13 +31,15 @@ public class AnnouncementService {
                                AnimalService animalService,
                                UserService userService,
                                AnnoucementTypeService annoucementTypeService,
-                               ImageAnnouncementService imageAnnouncementService) {
+                               ImageAnnouncementService imageAnnouncementService,
+                               AddressService addressService) {
         this.announcementRepository = announcementRepository;
         this.modelMapper = modelMapper;
         this.animalService = animalService;
         this.userService = userService;
         this.annoucementTypeService = annoucementTypeService;
         this.imageAnnouncementService = imageAnnouncementService;
+        this.addressService = addressService;
     }
 
     public Announcement createAnnouncement(Announcement announcementInput) {
@@ -78,6 +80,50 @@ public class AnnouncementService {
 
         return adoptionOutput;
     }
+
+    public FoundAnnouncementOutput createFoundAnnouncement(FoundAnnouncementInput announcementInput) {
+
+        // Cria ou atualiza o animal associado ao anúncio
+        Animal newAnimal = animalService.createAnimal(announcementInput.getAnimal());
+        AnnouncementType announcementType = annoucementTypeService.findById(announcementInput.getAnnouncementType().getId());
+        User user = userService.findById(announcementInput.getUserId());
+        Address newAddress = addressService.createAddress(announcementInput.getAddress());
+
+        // Prepara o objeto de entrada para o anúncio
+        announcementInput.setAnimal(modelMapper.map(newAnimal, AnimalInput.class));
+        announcementInput.setAddress(modelMapper.map(newAddress, AddressInput.class));
+        announcementInput.setAnnouncementType(announcementType);
+
+        Announcement announcement = modelMapper.map(announcementInput, Announcement.class);
+        announcement.setData(announcementInput.getData());
+        announcement.setContactEmail(user.getEmail());
+        announcement.setCreatedAt(LocalDateTime.now());
+        announcement.setUpdatedAt(LocalDateTime.now());
+        announcement.setUser(user);
+        announcement.setActive(true);
+        announcement.setId(null);
+
+        // Salva o anúncio no repositório
+        Announcement createdAnnouncement = announcementRepository.save(announcement);
+
+        // Cria a imagem associada ao anúncio
+        ImageAnnouncement image = imageAnnouncementService.createImageAnnouncement(announcementInput.getImageAnnouncement(), createdAnnouncement.getId());
+
+        // Mapeia o objeto `Announcement` salvo para `FoundAnnouncementOutput`
+        FoundAnnouncementOutput foundAnnouncementOutput = new FoundAnnouncementOutput();
+        foundAnnouncementOutput.setTitle(createdAnnouncement.getTitle());
+        foundAnnouncementOutput.setDescription(createdAnnouncement.getDescription());
+        foundAnnouncementOutput.setData(createdAnnouncement.getData());
+        foundAnnouncementOutput.setAddress(createdAnnouncement.getAddress().getId());
+        foundAnnouncementOutput.setAnimal(createdAnnouncement.getAnimal().getId());
+        foundAnnouncementOutput.setAnnouncementType(createdAnnouncement.getAnnouncementType().getId());
+        foundAnnouncementOutput.setContactPhone(createdAnnouncement.getContactPhone());
+        foundAnnouncementOutput.setUser(createdAnnouncement.getUser().getId());
+        foundAnnouncementOutput.setActive(createdAnnouncement.isActive());
+
+        return foundAnnouncementOutput;
+    }
+
 
 
     public Announcement findById(Long id) {
