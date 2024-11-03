@@ -41,22 +41,10 @@ public class UserService {
         this.addressService = addressService;
     }
 
-    public User createUser(UserRegistrationInput userInput){
-
-        User user = modelMapper.map(userInput, User.class);
-
-        user.setCreatedAt(LocalDate.now());
-        user.setUpdatedAt(LocalDate.now());
-        return userRepository.save(user);
-    }
-
     public User findById(Long id){
         Optional<User> existingUser = userRepository.findById(id);
 
-        if (existingUser.isPresent()){
-            return existingUser.get();
-        }
-        return null;
+        return existingUser.orElse(null);
     }
 
     public UserOutput updateUser(UserInput userInput) {
@@ -103,6 +91,7 @@ public class UserService {
         UserOutput userOutput = modelMapper.map(user, UserOutput.class);
 
         // Ajusta manualmente os campos que possam não estar corretamente mapeados
+        assert user != null;
         userOutput.setAddressId(user.getAddress()); // Mapeia o ID do endereço para o output
         return userOutput;
     }
@@ -122,12 +111,8 @@ public class UserService {
 
     public boolean authenticate(String email, String password) {
         Optional<User> user = userRepository.findByEmail(email);
-        if (user.isPresent()) {
-            // Verifique a senha. Idealmente, deve estar criptografada.
-            return user.get().getPassword().equals(password);
-
-        }
-        return false;
+        // Verifique a senha. Idealmente, deve estar criptografada.
+        return user.map(value -> value.getPassword().equals(password)).orElse(false);
     }
 
     public void forgotPassword(String email) {

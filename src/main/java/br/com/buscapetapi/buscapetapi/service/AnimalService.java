@@ -31,10 +31,7 @@ public class AnimalService {
     public Animal findById(Long id) {
         Optional<Animal> existingAnimal = animalRepository.findById(id);
 
-        if (existingAnimal.isPresent()) {
-            return existingAnimal.get();
-        }
-        return null;
+        return existingAnimal.orElse(null);
     }
 
     public Animal updateAnimal(AnimalInput animalInput) {
