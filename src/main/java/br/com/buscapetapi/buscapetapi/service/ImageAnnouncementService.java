@@ -1,7 +1,9 @@
 package br.com.buscapetapi.buscapetapi.service;
 
+import br.com.buscapetapi.buscapetapi.dto.input.ImageAnnouncementInput;
 import br.com.buscapetapi.buscapetapi.model.ImageAnnouncement;
 import br.com.buscapetapi.buscapetapi.repository.ImageAnnouncementRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -11,15 +13,21 @@ import java.util.Optional;
 public class ImageAnnouncementService {
 
     private final ImageAnnouncementRepository imageAnnouncementRepository;
+    private final ModelMapper modelMapper;
 
-    public ImageAnnouncementService(ImageAnnouncementRepository imageAnnouncementRepository) {
+    public ImageAnnouncementService(ImageAnnouncementRepository imageAnnouncementRepository,
+                                    ModelMapper modelMapper) {
         this.imageAnnouncementRepository = imageAnnouncementRepository;
+        this.modelMapper = modelMapper;
     }
 
-    public ImageAnnouncement createImageAnnouncement(ImageAnnouncement imageAnnouncementInput) {
+    public ImageAnnouncement createImageAnnouncement(ImageAnnouncementInput imageAnnouncementInput, Long announcementId) {
         imageAnnouncementInput.setCreatedAt(LocalDate.now());
         imageAnnouncementInput.setUpdatedAt(LocalDate.now());
-        return imageAnnouncementRepository.save(imageAnnouncementInput);
+        imageAnnouncementInput.setAnnouncementId(announcementId);
+
+        ImageAnnouncement image = modelMapper.map(imageAnnouncementInput, ImageAnnouncement.class);
+        return imageAnnouncementRepository.save(image);
     }
 
     public ImageAnnouncement findById(Long id) {

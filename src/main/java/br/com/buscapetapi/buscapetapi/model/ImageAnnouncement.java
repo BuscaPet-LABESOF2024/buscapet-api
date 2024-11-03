@@ -17,8 +17,7 @@ public class ImageAnnouncement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
-    private byte[] image;
+    private String image;
 
     @Column(name = "created_at")
     private LocalDate createdAt;

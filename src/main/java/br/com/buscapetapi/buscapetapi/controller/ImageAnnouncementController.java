@@ -1,5 +1,6 @@
 package br.com.buscapetapi.buscapetapi.controller;
 
+import br.com.buscapetapi.buscapetapi.dto.input.ImageAnnouncementInput;
 import br.com.buscapetapi.buscapetapi.model.ImageAnnouncement;
 import br.com.buscapetapi.buscapetapi.service.ImageAnnouncementService;
 import jakarta.validation.Valid;
@@ -17,8 +18,8 @@ public class ImageAnnouncementController {
     }
 
     @PostMapping("/new-image-announcement")
-    public ResponseEntity<ImageAnnouncement> createImageAnnouncement(@Valid @RequestBody ImageAnnouncement imageAnnouncementInput) {
-        ImageAnnouncement createdImageAnnouncement = imageAnnouncementService.createImageAnnouncement(imageAnnouncementInput);
+    public ResponseEntity<ImageAnnouncement> createImageAnnouncement(@Valid @RequestBody ImageAnnouncementInput imageAnnouncementInput, Long announcementId) {
+        ImageAnnouncement createdImageAnnouncement = imageAnnouncementService.createImageAnnouncement(imageAnnouncementInput, announcementId);
         return ResponseEntity.ok(createdImageAnnouncement);
     }
 

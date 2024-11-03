@@ -14,6 +14,6 @@ public class AdoptionAnnouncementInput {
     private AnnouncementType announcementType;
     private String contactPhone;
     private Long userId;
-    private ImageAnnouncement imageAnnouncement;
+    private ImageAnnouncementInput imageAnnouncement;
 
 }
