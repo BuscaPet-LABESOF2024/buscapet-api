@@ -1,9 +1,14 @@
 package br.com.buscapetapi.buscapetapi.service;
 
 import br.com.buscapetapi.buscapetapi.dto.input.AdoptionAnnouncementInput;
+import br.com.buscapetapi.buscapetapi.dto.input.AnimalInput;
+import br.com.buscapetapi.buscapetapi.dto.output.AdoptionAnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.AnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.ImageAnnouncementOutput;
+import br.com.buscapetapi.buscapetapi.model.Animal;
 import br.com.buscapetapi.buscapetapi.model.Announcement;
+import br.com.buscapetapi.buscapetapi.model.AnnouncementType;
+import br.com.buscapetapi.buscapetapi.model.User;
 import br.com.buscapetapi.buscapetapi.repository.AnnouncementRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -17,11 +22,21 @@ import java.util.stream.Collectors;
 public class AnnouncementService {
     private final AnnouncementRepository announcementRepository;
     private final ModelMapper modelMapper;
+    private final AnimalService animalService;
+    private final UserService userService;
+    private final AnnoucementTypeService annoucementTypeService;
 
 
-    public AnnouncementService(AnnouncementRepository announcementRepository, ModelMapper modelMapper) {
+    public AnnouncementService(AnnouncementRepository announcementRepository,
+                               ModelMapper modelMapper,
+                               AnimalService animalService,
+                               UserService userService,
+                               AnnoucementTypeService annoucementTypeService) {
         this.announcementRepository = announcementRepository;
         this.modelMapper = modelMapper;
+        this.animalService = animalService;
+        this.userService = userService;
+        this.annoucementTypeService = annoucementTypeService;
     }
 
     public Announcement createAnnouncement(Announcement announcementInput) {
@@ -30,13 +45,36 @@ public class AnnouncementService {
         return announcementRepository.save(announcementInput);
     }
 
-    public Announcement createAdoptionAnnoucement(AdoptionAnnouncementInput announcementInput){
+    public AdoptionAnnouncementOutput createAdoptionAnnouncement(AdoptionAnnouncementInput announcementInput) {
+        // Criação do animal e busca pelo tipo de anúncio
+        Animal newAnimal = animalService.createAnimal(announcementInput.getAnimal());
+        AnnouncementType announcementType = annoucementTypeService.findById(announcementInput.getAnnouncementType().getId());
+        User user = userService.findById(announcementInput.getUserId());
+
+        // Ajusta os dados do input para o anúncio
+        announcementInput.setAnimal(modelMapper.map(newAnimal, AnimalInput.class));
+        announcementInput.setAnnouncementType(announcementType);
+
         Announcement announcement = modelMapper.map(announcementInput, Announcement.class);
-        announcement.setContactEmail(announcementInput.getUser().getEmail());
+        announcement.setContactEmail(user.getEmail());
         announcement.setCreatedAt(LocalDateTime.now());
         announcement.setUpdatedAt(LocalDateTime.now());
-        return announcementRepository.save(announcement);
+
+        Announcement createdAnnouncement = announcementRepository.save(announcement);
+
+        // Mapeia para o formato de saída
+        AdoptionAnnouncementOutput adoptionOutput = new AdoptionAnnouncementOutput();
+        adoptionOutput.setTitle(createdAnnouncement.getTitle());
+        adoptionOutput.setDescription(createdAnnouncement.getDescription());
+        adoptionOutput.setAnimal(createdAnnouncement.getAnimal().getId());
+        adoptionOutput.setAnnouncementType(createdAnnouncement.getAnnouncementType().getId());
+        adoptionOutput.setContactPhone(createdAnnouncement.getContactPhone());
+        adoptionOutput.setUser(createdAnnouncement.getUser().getId());
+        adoptionOutput.setActive(true);
+
+        return adoptionOutput;
     }
+
 
     public Announcement findById(Long id) {
         Optional<Announcement> existingAnnouncement = announcementRepository.findById(id);

@@ -1,6 +1,7 @@
 package br.com.buscapetapi.buscapetapi.controller;
 
 import br.com.buscapetapi.buscapetapi.dto.input.AdoptionAnnouncementInput;
+import br.com.buscapetapi.buscapetapi.dto.input.AnimalInput;
 import br.com.buscapetapi.buscapetapi.dto.output.AdoptionAnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.AnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.ImageAnnouncementOutput;
@@ -24,20 +25,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/announcement")
 public class AnnouncementController {
     private final AnnouncementService announcementService;
-    private final AnimalService animalService;
-    private final UserService userService;
-    private final AnnoucementTypeService annoucementTypeService;
     private final ModelMapper modelMapper;
 
     public AnnouncementController(AnnouncementService announcementService,
-                                  AnimalService animalService,
-                                  UserService userService,
-                                  AnnoucementTypeService annoucementTypeService,
                                   ModelMapper modelMapper) {
         this.announcementService = announcementService;
-        this.animalService = animalService;
-        this.userService = userService;
-        this.annoucementTypeService = annoucementTypeService;
         this.modelMapper = modelMapper;
     }
 
@@ -48,33 +40,15 @@ public class AnnouncementController {
     }
 
     @PostMapping("new-adoption-announcement")
-    public ResponseEntity<?> createAdoptionAnnouncement(@Valid @RequestBody AdoptionAnnouncementInput announcementInput) {
+    public ResponseEntity<AdoptionAnnouncementOutput> createAdoptionAnnouncement(
+            @Valid @RequestBody AdoptionAnnouncementInput announcementInput) {
 
-        Animal newAnimal = animalService.createAnimal(announcementInput.getAnimal());
-        User user = userService.findById(announcementInput.getUser().getId());
-        AnnouncementType announcementType = annoucementTypeService.findById(announcementInput.getAnnouncementType().getId());
+        // Chamando o serviço para criar o anúncio de adoção
+        AdoptionAnnouncementOutput createdAdoption =
+                announcementService.createAdoptionAnnouncement(announcementInput);
 
-        // Ajusta o anúncio de adoção com os objetos corretos
-        announcementInput.setAnimal(newAnimal);
-        announcementInput.setUser(user);
-        announcementInput.setAnnouncementType(announcementType);
-
-        // Cria o anúncio de adoção
-        Announcement createdAdoptionAnnouncement = announcementService.createAdoptionAnnoucement(announcementInput);
-
-        // Mapeia o anúncio criado para o formato de saída
-        AdoptionAnnouncementOutput adoption = new AdoptionAnnouncementOutput();
-        adoption.setTitle(createdAdoptionAnnouncement.getTitle());
-        adoption.setDescription(createdAdoptionAnnouncement.getDescription());
-        adoption.setAnimal(createdAdoptionAnnouncement.getAnimal().getId());
-        adoption.setAnnouncementType(createdAdoptionAnnouncement.getAnnouncementType().getId());
-        adoption.setContactPhone(createdAdoptionAnnouncement.getContactPhone());
-        adoption.setUser(createdAdoptionAnnouncement.getUser().getId());
-        adoption.setActive(true);
-
-        return ResponseEntity.ok(adoption);
+        return ResponseEntity.ok(createdAdoption);
     }
-
 
     @PutMapping("/update-announcement")
     public ResponseEntity<Announcement> updateAnnouncement(@Valid @RequestBody Announcement announcementInput) {

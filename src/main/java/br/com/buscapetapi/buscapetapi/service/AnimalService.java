@@ -1,8 +1,10 @@
 package br.com.buscapetapi.buscapetapi.service;
 
+import br.com.buscapetapi.buscapetapi.dto.input.AnimalInput;
 import br.com.buscapetapi.buscapetapi.model.Animal;
 import br.com.buscapetapi.buscapetapi.model.Announcement;
 import br.com.buscapetapi.buscapetapi.repository.AnimalRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -12,15 +14,18 @@ import java.util.Optional;
 public class AnimalService {
 
     private final AnimalRepository animalRepository;
+    private final ModelMapper modelMapper;
 
-    public AnimalService(AnimalRepository animalRepository) {
+    public AnimalService(AnimalRepository animalRepository, ModelMapper modelMapper) {
         this.animalRepository = animalRepository;
+        this.modelMapper = modelMapper;
     }
 
-    public Animal createAnimal(Animal animalInput) {
+    public Animal createAnimal(AnimalInput animalInput) {
         animalInput.setCreatedAt(LocalDateTime.now());
         animalInput.setUpdatedAt(LocalDateTime.now());
-        return animalRepository.save(animalInput);
+        Animal animal = modelMapper.map(animalInput, Animal.class);
+        return animalRepository.save(animal);
     }
 
     public Animal findById(Long id) {
@@ -32,7 +37,7 @@ public class AnimalService {
         return null;
     }
 
-    public Animal updateAnimal(Animal animalInput) {
+    public Animal updateAnimal(AnimalInput animalInput) {
         Optional<Animal> existingAnimal = animalRepository.findById(animalInput.getId());
 
         if (existingAnimal.isPresent()) {
@@ -45,7 +50,6 @@ public class AnimalService {
             animal.setSize(animalInput.getSize());
             animal.setWeight(animalInput.getWeight());
             animal.setAge(animalInput.getAge());
-            animal.setCreatedAt(animalInput.getCreatedAt());
             animal.setUpdatedAt(LocalDateTime.now());
 
             return animalRepository.save(animal);

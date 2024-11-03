@@ -1,7 +1,9 @@
 package br.com.buscapetapi.buscapetapi.service;
 
+import br.com.buscapetapi.buscapetapi.dto.input.AddressInput;
 import br.com.buscapetapi.buscapetapi.model.Address;
 import br.com.buscapetapi.buscapetapi.repository.AddressRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -11,15 +13,18 @@ import java.util.Optional;
 public class AddressService {
 
     private final AddressRepository addressRepository;
+    private final ModelMapper modelMapper;
 
-    public AddressService(AddressRepository addressRepository) {
+    public AddressService(AddressRepository addressRepository, ModelMapper modelMapper) {
         this.addressRepository = addressRepository;
+        this.modelMapper = modelMapper;
     }
 
-    public Address createAddress(Address addressInput) {
+    public Address createAddress(AddressInput addressInput) {
         addressInput.setCreatedAt(LocalDateTime.now());
         addressInput.setUpdatedAt(LocalDateTime.now());
-        return addressRepository.save(addressInput);
+        Address address = modelMapper.map(addressInput, Address.class);
+        return addressRepository.save(address);
     }
 
     public Address findById(Long id) {
@@ -31,7 +36,7 @@ public class AddressService {
         return null;
     }
 
-    public Address updateAddress(Address addressInput) {
+    public Address updateAddress(AddressInput addressInput) {
         Optional<Address> existingAddress = addressRepository.findById(addressInput.getId());
 
         if (existingAddress.isPresent()) {
@@ -41,8 +46,9 @@ public class AddressService {
             address.setNumber(addressInput.getNumber());
             address.setNeighborhood(addressInput.getNeighborhood());
             address.setCep(addressInput.getCep());
-            address.setCreatedAt(addressInput.getCreatedAt()); // Preservar a data de criação
             address.setUpdatedAt(LocalDateTime.now());
+            address.setReferencia(addressInput.getReferencia());
+            address.setComplemento(addressInput.getComplemento());
 
             return addressRepository.save(address);
         }

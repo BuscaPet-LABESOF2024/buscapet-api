@@ -10,10 +10,10 @@ import lombok.Data;
 public class AdoptionAnnouncementInput {
     private String title;
     private String description;
-    private Animal animal;
+    private AnimalInput animal;
     private AnnouncementType announcementType;
     private String contactPhone;
-    private User user;
+    private Long userId;
     private ImageAnnouncement imageAnnouncement;
 
 }

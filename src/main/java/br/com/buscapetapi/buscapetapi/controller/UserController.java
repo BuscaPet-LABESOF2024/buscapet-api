@@ -1,9 +1,13 @@
 package br.com.buscapetapi.buscapetapi.controller;
 
+import br.com.buscapetapi.buscapetapi.dto.input.UserInput;
 import br.com.buscapetapi.buscapetapi.dto.input.UserRegistrationInput;
+import br.com.buscapetapi.buscapetapi.dto.output.UserOutput;
+import br.com.buscapetapi.buscapetapi.dto.output.UserRegistrationOutput;
 import br.com.buscapetapi.buscapetapi.model.User;
 import br.com.buscapetapi.buscapetapi.service.UserService;
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,20 +20,24 @@ import java.util.Optional;
 @RequestMapping("user")
 public class UserController {
     private final UserService userService;
+    private final ModelMapper modelMapper;
 
-    public UserController(UserService userService){
+    public UserController(UserService userService,
+                          ModelMapper modelMapper) {
         this.userService = userService;
+        this.modelMapper = modelMapper;
     }
 
     @PostMapping("/new-account")
-    public ResponseEntity<User> createUser (@Valid @RequestBody UserRegistrationInput userInput){
+    public ResponseEntity<UserRegistrationOutput> createUser (@Valid @RequestBody UserRegistrationInput userInput){
         User createdUser = userService.createUser(userInput);
-        return ResponseEntity.ok(createdUser);
+        UserRegistrationOutput user = modelMapper.map(createdUser, UserRegistrationOutput.class);
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/update-user")
-    public ResponseEntity<User> updateUser(@Valid @RequestBody User userInput){
-        User updatedUser = userService.updateUser(userInput);
+    public ResponseEntity<UserOutput> updateUser(@Valid @RequestBody UserInput userInput){
+        UserOutput updatedUser = userService.updateUser(userInput);
         return ResponseEntity.ok(updatedUser);
     }
 

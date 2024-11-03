@@ -35,4 +35,10 @@ public class Address {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(length = 150)
+    private String referencia;
+
+    @Column(length = 150)
+    private String complemento;
 }
