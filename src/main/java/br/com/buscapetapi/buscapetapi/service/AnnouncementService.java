@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -127,9 +128,15 @@ public class AnnouncementService {
         output.setCreatedAt(announcement.getCreatedAt());
         output.setUpdatedAt(announcement.getUpdatedAt());
         //tá dando erro agora que a image é string
-//        output.setImages(announcement.getImages().stream()
-//                .map(image -> new ImageAnnouncementOutput(image.getId(), image.getImage()))
-//                .collect(Collectors.toList()));
+        if (announcement.getImages() != null) {
+            // Mapeia as imagens para ImageAnnouncementOutput
+            List<ImageAnnouncementOutput> imageOutputs = announcement.getImages().stream()
+                    .map(image -> new ImageAnnouncementOutput(image.getId(), image.getImage()))
+                    .collect(Collectors.toList());
+            output.setImages(imageOutputs);
+        } else {
+            output.setImages(Collections.emptyList()); // Inicializa como lista vazia se nula
+        }
         return output;
     }
 
