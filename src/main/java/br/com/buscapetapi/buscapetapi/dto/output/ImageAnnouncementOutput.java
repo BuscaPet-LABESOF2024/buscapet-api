@@ -15,4 +15,9 @@ public class ImageAnnouncementOutput {
     private LocalDate createdAt;
     private LocalDate updatedAt;
     private Long announcementId;
+
+    public ImageAnnouncementOutput(Long id, String image) {
+        this.id = id;
+        this.image = image;
+    }
 }

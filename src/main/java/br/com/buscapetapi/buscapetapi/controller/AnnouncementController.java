@@ -43,6 +43,8 @@ public class AnnouncementController {
     public ResponseEntity<AdoptionAnnouncementOutput> createAdoptionAnnouncement(
             @Valid @RequestBody AdoptionAnnouncementInput announcementInput) {
 
+        System.out.println("announcementInput --> " + announcementInput);
+
         // Chamando o serviço para criar o anúncio de adoção
         AdoptionAnnouncementOutput createdAdoption =
                 announcementService.createAdoptionAnnouncement(announcementInput);
