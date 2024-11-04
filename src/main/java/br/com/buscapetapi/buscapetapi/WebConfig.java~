@@ -1,0 +1,4 @@
+package br.com.buscapetapi.buscapetapi;
+
+public class WebConfig {
+}
