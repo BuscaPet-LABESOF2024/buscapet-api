@@ -74,6 +74,8 @@ public class AnnouncementService {
         adoptionOutput.setUser(createdAnnouncement.getUser().getId());
         adoptionOutput.setActive(true);
 
+
+
         // Acrescenta o id do anuncio já criado a imagem
         ImageAnnouncement image = imageAnnouncementService.createImageAnnouncement(announcementInput.getImageAnnouncement(), createdAnnouncement.getId());
 
