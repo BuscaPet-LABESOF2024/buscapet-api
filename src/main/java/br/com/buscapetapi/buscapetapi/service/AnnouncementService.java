@@ -7,15 +7,12 @@ import br.com.buscapetapi.buscapetapi.dto.output.FoundAnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.ImageAnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.model.*;
 import br.com.buscapetapi.buscapetapi.repository.AnnouncementRepository;
-import br.com.buscapetapi.buscapetapi.repository.AnnouncementSpecification;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,14 +45,14 @@ public class AnnouncementService {
         this.addressService = addressService;
     }
 
-    public List<AnnouncementOutput> findByFilters(Search search) {
+    public List<AnnouncementOutput> findByFilters(SearchInput searchInput) {
         List<Announcement> announcements = announcementRepository.findAll(
-                byAnnouncementType(search.getAnnouncementType())
-                        .and(byAnimalType(search.getAnimalType()))
-                        .and(byAnimalBreed(search.getAnimalBreed()))
-                        .and(byDate(search.getDataInicial(), search.getDataFinal()))
-                        .and(bySize(search.getAnimalSize()))
-                        .and(byNeighborhood(search.getNeighborhood()))
+                byAnnouncementType(searchInput.getAnnouncementType())
+                        .and(byAnimalType(searchInput.getAnimalType()))
+                        .and(byAnimalBreed(searchInput.getAnimalBreed()))
+                        .and(byDate(searchInput.getDataInicial(), searchInput.getDataFinal()))
+                        .and(bySize(searchInput.getAnimalSize()))
+                        .and(byNeighborhood(searchInput.getNeighborhood()))
         );
 
         // Mapeando os resultados para AnnouncementOutput usando o modelMapper
