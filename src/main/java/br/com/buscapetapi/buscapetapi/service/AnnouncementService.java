@@ -209,7 +209,7 @@ public class AnnouncementService {
         return output;
     }
 
-    public List<String> findTypes() {
-        return announcementTypeRepository.findTypes();
+    public List<AnnouncementType> findTypes() {
+        return announcementTypeRepository.findAll();
     }
 }
