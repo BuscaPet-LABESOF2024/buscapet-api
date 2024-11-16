@@ -7,14 +7,20 @@ import br.com.buscapetapi.buscapetapi.dto.output.FoundAnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.ImageAnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.model.*;
 import br.com.buscapetapi.buscapetapi.repository.AnnouncementRepository;
+import br.com.buscapetapi.buscapetapi.repository.AnnouncementSpecification;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static br.com.buscapetapi.buscapetapi.repository.AnnouncementSpecification.*;
+import static br.com.buscapetapi.buscapetapi.repository.AnnouncementSpecification.byAnnouncementType;
 
 @Service
 public class AnnouncementService {
@@ -25,7 +31,6 @@ public class AnnouncementService {
     private final AnnoucementTypeService annoucementTypeService;
     private final ImageAnnouncementService imageAnnouncementService;
     private final AddressService addressService;
-
 
     public AnnouncementService(AnnouncementRepository announcementRepository,
                                ModelMapper modelMapper,
@@ -42,6 +47,23 @@ public class AnnouncementService {
         this.imageAnnouncementService = imageAnnouncementService;
         this.addressService = addressService;
     }
+
+    public List<AnnouncementOutput> findByFilters(Search search) {
+        List<Announcement> announcements = announcementRepository.findAll(
+                byAnnouncementType(search.getAnnouncementType())
+                        .and(byAnimalType(search.getAnimalType()))
+                        .and(byAnimalBreed(search.getAnimalBreed()))
+                        .and(byDate(search.getDataInicial(), search.getDataFinal()))
+                        .and(bySize(search.getAnimalSize()))
+                        .and(byNeighborhood(search.getNeighborhood()))
+        );
+
+        // Mapeando os resultados para AnnouncementOutput usando o modelMapper
+        return announcements.stream()
+                .map(announcement -> modelMapper.map(announcement, AnnouncementOutput.class))
+                .toList();
+    }
+
 
     public Announcement createAnnouncement(Announcement announcementInput) {
         announcementInput.setCreatedAt(LocalDateTime.now());
@@ -75,7 +97,6 @@ public class AnnouncementService {
         adoptionOutput.setContactPhone(createdAnnouncement.getContactPhone());
         adoptionOutput.setUser(createdAnnouncement.getUser().getId());
         adoptionOutput.setActive(true);
-
 
 
         // Acrescenta o id do anuncio já criado a imagem
@@ -126,7 +147,6 @@ public class AnnouncementService {
 
         return foundAnnouncementOutput;
     }
-
 
 
     public Announcement findById(Long id) {

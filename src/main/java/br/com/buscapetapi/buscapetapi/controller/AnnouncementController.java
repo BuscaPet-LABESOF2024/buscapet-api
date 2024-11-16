@@ -1,18 +1,9 @@
 package br.com.buscapetapi.buscapetapi.controller;
 
-import br.com.buscapetapi.buscapetapi.dto.input.AdoptionAnnouncementInput;
-import br.com.buscapetapi.buscapetapi.dto.input.AnimalInput;
-import br.com.buscapetapi.buscapetapi.dto.input.FoundAnnouncementInput;
-import br.com.buscapetapi.buscapetapi.dto.input.LostAnnouncementInput;
+import br.com.buscapetapi.buscapetapi.dto.input.*;
 import br.com.buscapetapi.buscapetapi.dto.output.*;
-import br.com.buscapetapi.buscapetapi.model.Animal;
 import br.com.buscapetapi.buscapetapi.model.Announcement;
-import br.com.buscapetapi.buscapetapi.model.AnnouncementType;
-import br.com.buscapetapi.buscapetapi.model.User;
-import br.com.buscapetapi.buscapetapi.service.AnimalService;
-import br.com.buscapetapi.buscapetapi.service.AnnoucementTypeService;
 import br.com.buscapetapi.buscapetapi.service.AnnouncementService;
-import br.com.buscapetapi.buscapetapi.service.UserService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -80,6 +71,12 @@ public class AnnouncementController {
     public ResponseEntity<Announcement> updateAnnouncement(@Valid @RequestBody Announcement announcementInput) {
         Announcement updatedAnnouncement = announcementService.updateAnnouncement(announcementInput);
         return ResponseEntity.ok(updatedAnnouncement);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestBody Search search) {
+        List<AnnouncementOutput> announcements = announcementService.findByFilters(search);
+        return  ResponseEntity.ok(announcements);
     }
 
     @GetMapping("/{id}")
