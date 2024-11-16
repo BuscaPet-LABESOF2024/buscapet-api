@@ -9,6 +9,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("animal")
 public class AnimalController {
@@ -39,5 +41,12 @@ public class AnimalController {
     public ResponseEntity<Animal> getAnimal(@PathVariable Long id) {
         Animal animal = animalService.findById(id);
         return ResponseEntity.ok(animal);
+    }
+
+    @GetMapping("/breeds")
+    public ResponseEntity<List<String>> getBreeds() {
+        List<String> breeds = animalService.findBreeds();
+
+        return ResponseEntity.ok(breeds);
     }
 }
