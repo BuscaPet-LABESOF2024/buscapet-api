@@ -7,6 +7,7 @@ import br.com.buscapetapi.buscapetapi.dto.output.FoundAnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.ImageAnnouncementOutput;
 import br.com.buscapetapi.buscapetapi.model.*;
 import br.com.buscapetapi.buscapetapi.repository.AnnouncementRepository;
+import br.com.buscapetapi.buscapetapi.repository.AnnouncementTypeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ import static br.com.buscapetapi.buscapetapi.repository.AnnouncementSpecificatio
 @Service
 public class AnnouncementService {
     private final AnnouncementRepository announcementRepository;
+    private final AnnouncementTypeRepository announcementTypeRepository;
     private final ModelMapper modelMapper;
     private final AnimalService animalService;
     private final UserService userService;
@@ -30,6 +32,7 @@ public class AnnouncementService {
     private final AddressService addressService;
 
     public AnnouncementService(AnnouncementRepository announcementRepository,
+                               AnnouncementTypeRepository announcementTypeRepository,
                                ModelMapper modelMapper,
                                AnimalService animalService,
                                UserService userService,
@@ -37,6 +40,7 @@ public class AnnouncementService {
                                ImageAnnouncementService imageAnnouncementService,
                                AddressService addressService) {
         this.announcementRepository = announcementRepository;
+        this.announcementTypeRepository = announcementTypeRepository;
         this.modelMapper = modelMapper;
         this.animalService = animalService;
         this.userService = userService;
@@ -205,4 +209,7 @@ public class AnnouncementService {
         return output;
     }
 
+    public List<String> findTypes() {
+        return announcementTypeRepository.findTypes();
+    }
 }

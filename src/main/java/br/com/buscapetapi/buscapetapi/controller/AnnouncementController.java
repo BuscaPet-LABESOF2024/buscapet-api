@@ -103,4 +103,11 @@ public class AnnouncementController {
         return ResponseEntity.ok(announcements);
     }
 
+    @GetMapping("/types")
+    public ResponseEntity<List<String>> getTypes() {
+        List<String> types = announcementService.findTypes();
+
+        return ResponseEntity.ok(types);
+    }
+
 }
