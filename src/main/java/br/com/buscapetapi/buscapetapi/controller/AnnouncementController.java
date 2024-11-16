@@ -3,6 +3,7 @@ package br.com.buscapetapi.buscapetapi.controller;
 import br.com.buscapetapi.buscapetapi.dto.input.*;
 import br.com.buscapetapi.buscapetapi.dto.output.*;
 import br.com.buscapetapi.buscapetapi.model.Announcement;
+import br.com.buscapetapi.buscapetapi.model.AnnouncementType;
 import br.com.buscapetapi.buscapetapi.service.AnnouncementService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -104,8 +105,8 @@ public class AnnouncementController {
     }
 
     @GetMapping("/types")
-    public ResponseEntity<List<String>> getTypes() {
-        List<String> types = announcementService.findTypes();
+    public ResponseEntity<List<AnnouncementType>> getTypes() {
+        List<AnnouncementType> types = announcementService.findTypes();
 
         return ResponseEntity.ok(types);
     }
