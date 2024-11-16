@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -51,4 +52,9 @@ public class AddressService {
         }
         return null;
     }
+
+    public List<String> findNeighborhoods() {
+        return addressRepository.findDistinctNeighborhoods();
+    }
+
 }

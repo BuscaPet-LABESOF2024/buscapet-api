@@ -74,8 +74,8 @@ public class AnnouncementController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestBody Search search) {
-        List<AnnouncementOutput> announcements = announcementService.findByFilters(search);
+    public ResponseEntity<?> search(@RequestBody SearchInput searchInput) {
+        List<AnnouncementOutput> announcements = announcementService.findByFilters(searchInput);
         return  ResponseEntity.ok(announcements);
     }
 

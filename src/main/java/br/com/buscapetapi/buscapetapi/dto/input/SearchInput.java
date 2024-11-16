@@ -1,12 +1,11 @@
 package br.com.buscapetapi.buscapetapi.dto.input;
 
-import br.com.buscapetapi.buscapetapi.model.*;
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
-public class Search {
+public class SearchInput {
     private Long announcementType;
     private String animalType;
     private String animalBreed;

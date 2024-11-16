@@ -9,6 +9,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/address")
 public class AddressController {
@@ -44,5 +46,12 @@ public class AddressController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/neighborhoods")
+    public ResponseEntity<List<String>> getNeighborhoods() {
+        List<String> neighborhoods = addressService.findNeighborhoods();
+
+        return ResponseEntity.ok(neighborhoods);
     }
 }
