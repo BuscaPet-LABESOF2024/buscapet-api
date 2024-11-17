@@ -75,7 +75,7 @@ public class AnnouncementController {
         return ResponseEntity.ok(updatedAnnouncement);
     }
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     public ResponseEntity<?> search(@RequestBody SearchInput searchInput,
                                     @RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
         Page<AnnouncementOutput> announcements = announcementService.findByFilters(searchInput, pageNumber);
