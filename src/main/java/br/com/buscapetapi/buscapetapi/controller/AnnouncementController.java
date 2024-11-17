@@ -7,6 +7,7 @@ import br.com.buscapetapi.buscapetapi.model.AnnouncementType;
 import br.com.buscapetapi.buscapetapi.service.AnnouncementService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,8 +76,9 @@ public class AnnouncementController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestBody SearchInput searchInput) {
-        List<AnnouncementOutput> announcements = announcementService.findByFilters(searchInput);
+    public ResponseEntity<?> search(@RequestBody SearchInput searchInput,
+                                    @RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
+        Page<AnnouncementOutput> announcements = announcementService.findByFilters(searchInput, pageNumber);
         return  ResponseEntity.ok(announcements);
     }
 

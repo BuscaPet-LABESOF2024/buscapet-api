@@ -9,6 +9,9 @@ import br.com.buscapetapi.buscapetapi.model.*;
 import br.com.buscapetapi.buscapetapi.repository.AnnouncementRepository;
 import br.com.buscapetapi.buscapetapi.repository.AnnouncementTypeRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -49,21 +52,22 @@ public class AnnouncementService {
         this.addressService = addressService;
     }
 
-    public List<AnnouncementOutput> findByFilters(SearchInput searchInput) {
-        List<Announcement> announcements = announcementRepository.findAll(
+    public Page<AnnouncementOutput> findByFilters(SearchInput searchInput, Integer pageNumber) {
+        Pageable page = PageRequest.of(pageNumber, 5);
+        Page<Announcement> announcements = announcementRepository.findAll(
                 byAnnouncementType(searchInput.getAnnouncementType())
                         .and(byAnimalType(searchInput.getAnimalType()))
                         .and(byAnimalBreed(searchInput.getAnimalBreed()))
                         .and(byDate(searchInput.getDataInicial(), searchInput.getDataFinal()))
                         .and(bySize(searchInput.getAnimalSize()))
-                        .and(byNeighborhood(searchInput.getNeighborhood()))
+                        .and(byNeighborhood(searchInput.getNeighborhood())),
+                page
         );
 
-        // Mapeando os resultados para AnnouncementOutput usando o modelMapper
-        return announcements.stream()
-                .map(announcement -> modelMapper.map(announcement, AnnouncementOutput.class))
-                .toList();
+        // Mapeando os resultados para AnnouncementOutput usando modelMapper
+        return announcements.map(announcement -> modelMapper.map(announcement, AnnouncementOutput.class));
     }
+
 
 
     public Announcement createAnnouncement(Announcement announcementInput) {
