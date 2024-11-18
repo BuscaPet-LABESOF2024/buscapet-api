@@ -13,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/address")
 public class AddressController {
@@ -39,13 +37,23 @@ public class AddressController {
 
         Long userId = (Long) request.getAttribute("userId");  // Extraído do token JWT
 
+        i// Se não houver userId no request, retorna 401
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Se não houver userId no request, retorna 401
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Usuário não autenticado"); // Mensagem de erro mais clara
         }
 
-        AddressDataProfileOutput updatedAddress = addressService.updateAddress(userId, addressUpdateRequestInput);
+        try {
+            // Chama o serviço de atualização de endereço
+            AddressDataProfileOutput updatedAddress = addressService.updateAddress(userId, addressUpdateRequestInput);
 
-        return ResponseEntity.ok(updatedAddress);
+            // Retorna o endereço atualizado
+            return ResponseEntity.ok(updatedAddress);
+        } catch (RuntimeException ex) {
+            // Exceção caso algum erro ocorra na atualização (ex.: endereço não encontrado)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Erro ao atualizar o endereço: " + ex.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
@@ -56,12 +64,5 @@ public class AddressController {
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
-
-    @GetMapping("/neighborhoods")
-    public ResponseEntity<List<String>> getNeighborhoods() {
-        List<String> neighborhoods = addressService.findNeighborhoods();
-
-        return ResponseEntity.ok(neighborhoods);
     }
 }

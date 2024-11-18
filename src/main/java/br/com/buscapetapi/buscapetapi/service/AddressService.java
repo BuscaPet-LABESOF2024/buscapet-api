@@ -1,8 +1,12 @@
 package br.com.buscapetapi.buscapetapi.service;
 
 import br.com.buscapetapi.buscapetapi.dto.input.AddressInput;
+import br.com.buscapetapi.buscapetapi.dto.input.AddressUpdateRequestInput;
+import br.com.buscapetapi.buscapetapi.dto.output.AddressDataProfileOutput;
 import br.com.buscapetapi.buscapetapi.model.Address;
+import br.com.buscapetapi.buscapetapi.model.User;
 import br.com.buscapetapi.buscapetapi.repository.AddressRepository;
+import br.com.buscapetapi.buscapetapi.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +18,12 @@ import java.util.Optional;
 public class AddressService {
 
     private final AddressRepository addressRepository;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
-    public AddressService(AddressRepository addressRepository, ModelMapper modelMapper) {
+    public AddressService(AddressRepository addressRepository, UserRepository userRepository, ModelMapper modelMapper) {
         this.addressRepository = addressRepository;
+        this.userRepository = userRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -34,23 +40,47 @@ public class AddressService {
         return existingAddress.orElse(null);
     }
 
-    public Address updateAddress(AddressInput addressInput) {
-        Optional<Address> existingAddress = addressRepository.findById(addressInput.getId());
+    public AddressDataProfileOutput updateAddress(Long userId, AddressUpdateRequestInput addressInput) {
+        // Busca o usuário pelo userId
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        if (existingAddress.isPresent()) {
-            Address address = existingAddress.get();
+        // Pega o id do endereço do usuário
+        Long addressId = user.getAddress();
 
-            address.setStreet(addressInput.getStreet());
-            address.setNumber(addressInput.getNumber());
-            address.setNeighborhood(addressInput.getNeighborhood());
-            address.setCep(addressInput.getCep());
+        Address address;
+
+        //Usuário não possui endereço associado
+        if(addressId == null) {
+            // Se o usuário não possui um endereço, cria um novo
+            address = modelMapper.map(addressInput, Address.class);
+            address.setCreatedAt(LocalDateTime.now());
             address.setUpdatedAt(LocalDateTime.now());
-            address.setReferencia(addressInput.getReferencia());
-            address.setComplemento(addressInput.getComplemento());
 
-            return addressRepository.save(address);
+            // Salva o novo endereço
+            addressRepository.save(address);
+
+            // Associa o novo endereço ao usuário e salva o usuário
+            user.setAddress(address.getId());
+            userRepository.save(user);
+        } else {
+            // Se o endereço já existe, busca o endereço e atualiza seus campos
+            address = addressRepository.findById(addressId)
+                    .orElseThrow(() -> new RuntimeException("Endereço não encontrado"));
+
+            if (addressInput.getStreet() != null) address.setStreet(addressInput.getStreet());
+            if (addressInput.getNeighborhood() != null) address.setNeighborhood(addressInput.getNeighborhood());
+            if (addressInput.getNumber() != null) address.setNumber(addressInput.getNumber());
+            if (addressInput.getCep() != null) address.setCep(addressInput.getCep());
+            if (addressInput.getReferencia() != null) address.setReferencia(addressInput.getReferencia());
+            if (addressInput.getComplemento() != null) address.setComplemento(addressInput.getComplemento());
+            address.setUpdatedAt(LocalDateTime.now());
+
+            // Salva as atualizações no endereço
+            addressRepository.save(address);
         }
-        return null;
+        // Retorna o endereço atualizado como um DTO
+        return modelMapper.map(address, AddressDataProfileOutput.class);
     }
 
     public List<String> findNeighborhoods() {

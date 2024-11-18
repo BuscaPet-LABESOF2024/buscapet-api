@@ -7,7 +7,6 @@ import br.com.buscapetapi.buscapetapi.dto.input.UserUpdateRequestInput;
 import br.com.buscapetapi.buscapetapi.dto.output.AddressDataProfileOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.UserDataProfileOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.UserOutput;
-import br.com.buscapetapi.buscapetapi.dto.output.UserUpdateRequestOutput;
 import br.com.buscapetapi.buscapetapi.model.Address;
 import br.com.buscapetapi.buscapetapi.model.User;
 import br.com.buscapetapi.buscapetapi.repository.UserRepository;
@@ -53,7 +52,7 @@ public class UserService {
         return null;  // Retorna null se o usuário não for encontrado
     }
 
-    public UserUpdateRequestOutput updateUser(UserUpdateRequestInput userUpdateRequestInput, Long userId) {
+    public UserDataProfileOutput updateUser(UserUpdateRequestInput userUpdateRequestInput, Long userId) {
         // Buscar o usuário pelo ID
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
@@ -72,7 +71,7 @@ public class UserService {
         userRepository.save(user);
 
         // Mapear apenas os dados atualizados para o DTO de saída
-        UserUpdateRequestOutput profileOutput = new UserUpdateRequestOutput();
+        UserDataProfileOutput profileOutput = new UserDataProfileOutput();
         profileOutput.setName(user.getName());
         profileOutput.setPhone(user.getPhone());
 

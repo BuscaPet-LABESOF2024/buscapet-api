@@ -1,6 +1,7 @@
 package br.com.buscapetapi.buscapetapi.config;
 
 import br.com.buscapetapi.buscapetapi.repository.UserRepository;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

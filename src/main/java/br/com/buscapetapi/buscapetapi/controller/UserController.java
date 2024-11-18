@@ -2,10 +2,14 @@ package br.com.buscapetapi.buscapetapi.controller;
 
 import br.com.buscapetapi.buscapetapi.dto.input.UserInput;
 import br.com.buscapetapi.buscapetapi.dto.input.UserRegistrationInput;
+import br.com.buscapetapi.buscapetapi.dto.input.UserUpdateRequestInput;
+import br.com.buscapetapi.buscapetapi.dto.output.UserDataProfileOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.UserOutput;
 import br.com.buscapetapi.buscapetapi.dto.output.UserRegistrationOutput;
+import br.com.buscapetapi.buscapetapi.dto.output.UserUpdateRequestOutput;
 import br.com.buscapetapi.buscapetapi.model.User;
 import br.com.buscapetapi.buscapetapi.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -26,29 +30,44 @@ public class UserController {
     }
 
     @PutMapping("/update-user")
-    public ResponseEntity<UserOutput> updateUser(@Valid @RequestBody UserInput userInput){
-        UserOutput updatedUser = userService.updateUser(userInput);
+    public ResponseEntity<UserUpdateRequestOutput> updateUser(HttpServletRequest request, @Valid @RequestBody UserUpdateRequestInput userUpdateRequestInput) {
+        Long userId = (Long) request.getAttribute("userId");  // Extraído do token JWT
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Se não houver userId no request, retorna 401
+        }
+
+        UserUpdateRequestOutput updatedUser = userService.updateUser(userUpdateRequestInput,userId);
         return ResponseEntity.ok(updatedUser);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id){
+
         User user = userService.findById(id);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  // Retorna 404 caso não encontre o usuário
+        }
+
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        String password = request.get("password");
+    @GetMapping("/profile")
+    public ResponseEntity<UserDataProfileOutput> getUserProfile(HttpServletRequest request) {
 
-        boolean isAuthenticated = userService.authenticate(email, password);
-        if (isAuthenticated) {
-            String token = userService.generateToken(email);
-            return ResponseEntity.ok(token);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou senha incorretos");
+        Long userId = (Long) request.getAttribute("userId");  // Extraído do token JWT
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Se não houver userId no request, retorna 401
         }
+
+        UserDataProfileOutput profile = userService.getUserDataProfile(userId);
+
+        if (profile == null) {
+            return ResponseEntity.notFound().build(); // Retorna 404 caso o perfil não seja encontrado
+        }
+        return ResponseEntity.ok(profile);
     }
 
     @PostMapping("/forgot-password")
