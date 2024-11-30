@@ -2,7 +2,6 @@ package br.com.buscapetapi.buscapetapi.service;
 
 import br.com.buscapetapi.buscapetapi.dto.input.AnimalInput;
 import br.com.buscapetapi.buscapetapi.model.Animal;
-import br.com.buscapetapi.buscapetapi.model.Announcement;
 import br.com.buscapetapi.buscapetapi.repository.AnimalRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -55,7 +54,7 @@ public class AnimalService {
         return null;
     }
 
-    public List<String> findBreeds() {
+    public List<String> findAnnouncementsBreeds() {
         return animalRepository.findDistinctBreeds();
     }
 }

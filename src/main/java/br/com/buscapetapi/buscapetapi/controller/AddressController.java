@@ -60,7 +60,7 @@ public class AddressController {
 
     @GetMapping("/neighborhoods")
     public ResponseEntity<List<String>> getNeighborhoods() {
-        List<String> neighborhoods = addressService.findNeighborhoods();
+        List<String> neighborhoods = addressService.findAnnouncementsNeighborhoods();
 
         return ResponseEntity.ok(neighborhoods);
     }

@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Long> {
 
-    @Query("SELECT DISTINCT a.neighborhood FROM Address a")
+    @Query("SELECT DISTINCT a.neighborhood FROM Address a INNER JOIN Announcement an ON a.id = an.address.id")
     List<String> findDistinctNeighborhoods();
 }
