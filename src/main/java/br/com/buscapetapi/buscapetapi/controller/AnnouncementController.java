@@ -113,4 +113,10 @@ public class AnnouncementController {
         return ResponseEntity.ok(types);
     }
 
+    @GetMapping("/last-announcements")
+    public ResponseEntity<List<AnnouncementOutput>> getLastAnnouncements() {
+        List<AnnouncementOutput> announcements = announcementService.findLastAnnouncementsWithImages();
+        return ResponseEntity.ok(announcements);
+    }
+
 }

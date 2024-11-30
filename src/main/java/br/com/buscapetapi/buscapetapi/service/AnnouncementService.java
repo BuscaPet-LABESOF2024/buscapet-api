@@ -191,6 +191,13 @@ public class AnnouncementService {
                 .collect(Collectors.toList());
     }
 
+    public List<AnnouncementOutput> findLastAnnouncementsWithImages() {
+        List<Announcement> announcements = announcementRepository.findLastAnnouncements();
+        return announcements.stream()
+                .map(this::convertToAnnouncementOutput)
+                .collect(Collectors.toList());
+    }
+
     private AnnouncementOutput convertToAnnouncementOutput(Announcement announcement) {
         AnnouncementOutput output = new AnnouncementOutput();
         output.setId(announcement.getId());
