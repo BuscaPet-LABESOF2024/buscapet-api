@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -221,4 +222,16 @@ public class AnnouncementService {
     public List<AnnouncementType> findTypes() {
         return announcementTypeRepository.findAll();
     }
+
+    public List<AnnouncementOutput> findMyAnnouncements(Long userId) {
+        List<Announcement> announcements = announcementRepository.findByUserId(userId);
+
+        // Mapeia cada elemento da lista de Announcement para AnnouncementOutput
+        List<AnnouncementOutput> outputs = announcements.stream()
+                .map(announcement -> modelMapper.map(announcement, AnnouncementOutput.class))
+                .toList();
+
+        return outputs;
+    }
+
 }
