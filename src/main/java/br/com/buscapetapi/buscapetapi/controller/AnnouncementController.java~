@@ -1,12 +1,10 @@
 package br.com.buscapetapi.buscapetapi.controller;
 
-import br.com.buscapetapi.buscapetapi.config.UserCredentials;
 import br.com.buscapetapi.buscapetapi.dto.input.*;
 import br.com.buscapetapi.buscapetapi.dto.output.*;
 import br.com.buscapetapi.buscapetapi.model.Announcement;
 import br.com.buscapetapi.buscapetapi.model.AnnouncementType;
 import br.com.buscapetapi.buscapetapi.service.AnnouncementService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -36,11 +34,9 @@ public class AnnouncementController {
 
     @PostMapping("new-adoption-announcement")
     public ResponseEntity<AdoptionAnnouncementOutput> createAdoptionAnnouncement(
-            HttpServletRequest request,
             @Valid @RequestBody AdoptionAnnouncementInput announcementInput) {
 
-        //pegando id do token
-        announcementInput.setUserId(UserCredentials.getUserId(request));
+        System.out.println("announcementInput --> " + announcementInput);
 
         // Chamando o serviço para criar o anúncio de adoção
         AdoptionAnnouncementOutput createdAdoption =
@@ -51,11 +47,7 @@ public class AnnouncementController {
 
     @PostMapping("new-found-announcement")
     public ResponseEntity<FoundAnnouncementOutput> createFoundAnnouncement(
-            HttpServletRequest request,
             @Valid @RequestBody FoundAnnouncementInput announcementInput) {
-
-        //pegando id do token
-        announcementInput.setUserId(UserCredentials.getUserId(request));
 
         // Chamando o serviço para criar o anúncio de adoção
         FoundAnnouncementOutput createdAnnouncement =
@@ -66,11 +58,7 @@ public class AnnouncementController {
 
     @PostMapping("new-lost-announcement")
     public ResponseEntity<LostAnnouncementOutput> createLostAnnouncement(
-            HttpServletRequest request,
             @Valid @RequestBody LostAnnouncementInput announcementInput) {
-        //pegando id do token
-        announcementInput.setUserId(UserCredentials.getUserId(request));
-
         FoundAnnouncementInput announcement = modelMapper.map(announcementInput, FoundAnnouncementInput.class);
 
         // Chamando o serviço para criar o anúncio de adoção
@@ -89,9 +77,8 @@ public class AnnouncementController {
 
     @PostMapping("/search")
     public ResponseEntity<?> search(@RequestBody SearchInput searchInput,
-                                    @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
-                                    @RequestParam(required = false, defaultValue = "8") Integer size) {
-        Page<AnnouncementOutput> announcements = announcementService.findByFilters(searchInput, pageNumber, size);
+                                    @RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
+        Page<AnnouncementOutput> announcements = announcementService.findByFilters(searchInput, pageNumber);
         return  ResponseEntity.ok(announcements);
     }
 
@@ -124,21 +111,21 @@ public class AnnouncementController {
         System.out.println("Announcement Type ID: " + announcementTypeId);
 
         // Lógica específica para cada tipo de anúncio
-        return switch (announcementTypeId.intValue()) {
-            case 1 -> {
-                AnnoucementDetailsLostFoundOutput lostOutput = announcementService.annoucementDetailsLostFound(id);
-                yield ResponseEntity.ok(lostOutput); // DTO para perdido
-            }
-            case 2 -> {
-                AnnoucementDetailsLostFoundOutput foundOutput = announcementService.annoucementDetailsLostFound(id);
-                yield ResponseEntity.ok(foundOutput); // DTO para encontrado
-            }
-            case 3 -> {
+        switch (announcementTypeId.intValue()) {
+            case 1:
+                AnnoucementDetailsLostFoundOutput lostFoundOutput = announcementService.annoucementDetailsLostFound(id);
+                return ResponseEntity.ok(lostFoundOutput);
+            case 2:
+                AnnoucementDetailsLostFoundOutput lostFoundOutput = announcementService.annoucementDetailsLostFound(id);
+                return ResponseEntity.ok(lostFoundOutput);
+            case 3: // DTO para adoção
+                System.out.println("Entrou no adoption com o id do anúncio: " + id);
                 AnnoucementDetailsAdoptionOutput adoptionOutput = announcementService.annoucementDetailsAdoption(id);
-                yield ResponseEntity.ok(adoptionOutput); // DTO para adoção
-            }
-            default -> ResponseEntity.badRequest().body("Tipo de anúncio desconhecido");
-        };
+                System.out.println(adoptionOutput);
+                return ResponseEntity.ok(adoptionOutput);
+            default:
+                return ResponseEntity.badRequest().body("Tipo de anúncio desconhecido");
+        }
     }
 
 
@@ -154,12 +141,6 @@ public class AnnouncementController {
         List<AnnouncementType> types = announcementService.findTypes();
 
         return ResponseEntity.ok(types);
-    }
-    @GetMapping("/my-announcements")
-    public ResponseEntity<List<AnnouncementOutput>> getMyAnnouncements(HttpServletRequest request) {
-        Long userId = UserCredentials.getUserId(request);
-        List<AnnouncementOutput> announcements = announcementService.findMyAnnouncements(userId);
-        return ResponseEntity.ok(announcements);
     }
 
 }
