@@ -45,7 +45,7 @@ public class AnimalController {
 
     @GetMapping("/breeds")
     public ResponseEntity<List<String>> getBreeds() {
-        List<String> breeds = animalService.findBreeds();
+        List<String> breeds = animalService.findAnnouncementsBreeds();
 
         return ResponseEntity.ok(breeds);
     }

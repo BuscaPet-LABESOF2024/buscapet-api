@@ -1,10 +1,12 @@
 package br.com.buscapetapi.buscapetapi.controller;
 
+import br.com.buscapetapi.buscapetapi.config.UserCredentials;
 import br.com.buscapetapi.buscapetapi.dto.input.*;
 import br.com.buscapetapi.buscapetapi.dto.output.*;
 import br.com.buscapetapi.buscapetapi.model.Announcement;
 import br.com.buscapetapi.buscapetapi.model.AnnouncementType;
 import br.com.buscapetapi.buscapetapi.service.AnnouncementService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -34,9 +36,11 @@ public class AnnouncementController {
 
     @PostMapping("new-adoption-announcement")
     public ResponseEntity<AdoptionAnnouncementOutput> createAdoptionAnnouncement(
+            HttpServletRequest request,
             @Valid @RequestBody AdoptionAnnouncementInput announcementInput) {
 
-        System.out.println("announcementInput --> " + announcementInput);
+        //pegando id do token
+        announcementInput.setUserId(UserCredentials.getUserId(request));
 
         // Chamando o serviço para criar o anúncio de adoção
         AdoptionAnnouncementOutput createdAdoption =
@@ -47,7 +51,11 @@ public class AnnouncementController {
 
     @PostMapping("new-found-announcement")
     public ResponseEntity<FoundAnnouncementOutput> createFoundAnnouncement(
+            HttpServletRequest request,
             @Valid @RequestBody FoundAnnouncementInput announcementInput) {
+
+        //pegando id do token
+        announcementInput.setUserId(UserCredentials.getUserId(request));
 
         // Chamando o serviço para criar o anúncio de adoção
         FoundAnnouncementOutput createdAnnouncement =
@@ -58,7 +66,11 @@ public class AnnouncementController {
 
     @PostMapping("new-lost-announcement")
     public ResponseEntity<LostAnnouncementOutput> createLostAnnouncement(
+            HttpServletRequest request,
             @Valid @RequestBody LostAnnouncementInput announcementInput) {
+        //pegando id do token
+        announcementInput.setUserId(UserCredentials.getUserId(request));
+
         FoundAnnouncementInput announcement = modelMapper.map(announcementInput, FoundAnnouncementInput.class);
 
         // Chamando o serviço para criar o anúncio de adoção
@@ -77,8 +89,9 @@ public class AnnouncementController {
 
     @PostMapping("/search")
     public ResponseEntity<?> search(@RequestBody SearchInput searchInput,
-                                    @RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
-        Page<AnnouncementOutput> announcements = announcementService.findByFilters(searchInput, pageNumber);
+                                    @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
+                                    @RequestParam(required = false, defaultValue = "8") Integer size) {
+        Page<AnnouncementOutput> announcements = announcementService.findByFilters(searchInput, pageNumber, size);
         return  ResponseEntity.ok(announcements);
     }
 
@@ -111,6 +124,12 @@ public class AnnouncementController {
         List<AnnouncementType> types = announcementService.findTypes();
 
         return ResponseEntity.ok(types);
+    }
+    @GetMapping("/my-announcements")
+    public ResponseEntity<List<AnnouncementOutput>> getMyAnnouncements(HttpServletRequest request) {
+        Long userId = UserCredentials.getUserId(request);
+        List<AnnouncementOutput> announcements = announcementService.findMyAnnouncements(userId);
+        return ResponseEntity.ok(announcements);
     }
 
     @GetMapping("/last-announcements")

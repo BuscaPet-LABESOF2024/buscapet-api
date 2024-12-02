@@ -83,7 +83,7 @@ public class AddressService {
         return modelMapper.map(address, AddressDataProfileOutput.class);
     }
 
-    public List<String> findNeighborhoods() {
+    public List<String> findAnnouncementsNeighborhoods() {
         return addressRepository.findDistinctNeighborhoods();
     }
 

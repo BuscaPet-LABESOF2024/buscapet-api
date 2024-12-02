@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface AnimalRepository extends JpaRepository<Animal, Long> {
 
-    @Query("SELECT DISTINCT a.breed FROM Animal a")
+    @Query("SELECT DISTINCT a.breed FROM Animal a INNER JOIN Announcement an ON a.id = an.animal.id")
     List<String> findDistinctBreeds();
 }
