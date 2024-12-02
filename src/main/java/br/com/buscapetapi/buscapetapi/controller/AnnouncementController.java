@@ -90,7 +90,7 @@ public class AnnouncementController {
     @PostMapping("/search")
     public ResponseEntity<?> search(@RequestBody SearchInput searchInput,
                                     @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
-                                    @RequestParam(required = false, defaultValue = "8") Integer size) {
+                                    @RequestParam(required = false, defaultValue = "10") Integer size) {
         Page<AnnouncementOutput> announcements = announcementService.findByFilters(searchInput, pageNumber, size);
         return  ResponseEntity.ok(announcements);
     }
