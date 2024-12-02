@@ -1,10 +1,7 @@
 package br.com.buscapetapi.buscapetapi.service;
 
 import br.com.buscapetapi.buscapetapi.dto.input.*;
-import br.com.buscapetapi.buscapetapi.dto.output.AdoptionAnnouncementOutput;
-import br.com.buscapetapi.buscapetapi.dto.output.AnnouncementOutput;
-import br.com.buscapetapi.buscapetapi.dto.output.FoundAnnouncementOutput;
-import br.com.buscapetapi.buscapetapi.dto.output.ImageAnnouncementOutput;
+import br.com.buscapetapi.buscapetapi.dto.output.*;
 import br.com.buscapetapi.buscapetapi.model.*;
 import br.com.buscapetapi.buscapetapi.repository.AnnouncementRepository;
 import br.com.buscapetapi.buscapetapi.repository.AnnouncementTypeRepository;
@@ -13,9 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -60,8 +60,6 @@ public class AnnouncementService {
                         .and(bySize(searchInput.getAnimalSize())),
                 page
         );
-
-        System.out.println("announcements: " + announcements);
 
         // Mapeando os resultados para AnnouncementOutput usando modelMapper
         return announcements.map(announcement -> modelMapper.map(announcement, AnnouncementOutput.class));
@@ -164,7 +162,7 @@ public class AnnouncementService {
 
     //BPET-49 tela listar os animais
     public List<Announcement> findAll() {
-        return announcementRepository.findAll(Sort.by(Sort.Order.desc("id"))); // Chama o repositório para buscar todos os anúncios
+        return announcementRepository.findAll(); // Chama o repositório para buscar todos os anúncios
     }
 
     //editar um anúncio task BPET-38
@@ -222,6 +220,101 @@ public class AnnouncementService {
     public List<AnnouncementType> findTypes() {
         return announcementTypeRepository.findAll();
     }
+
+    public AnnoucementDetailsAdoptionOutput annoucementDetailsAdoption(Long id) {
+
+        System.out.println("Entrou no método annoucementDetailsAdoption com o id do anúncio: " + id);
+
+        Announcement announcement = announcementRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Anúncio não encontrado"));
+
+        // Inicializando o DTO
+        AnnoucementDetailsAdoptionOutput annoucementDetailsAdoptionOutput = new AnnoucementDetailsAdoptionOutput();
+        annoucementDetailsAdoptionOutput.setTitle(announcement.getTitle());
+        annoucementDetailsAdoptionOutput.setDescription(announcement.getDescription());
+        annoucementDetailsAdoptionOutput.setContactPhone(announcement.getContactPhone());
+        annoucementDetailsAdoptionOutput.setContactEmail(announcement.getContactEmail());
+
+        System.out.println("Dados do animal: " + announcement.getAnimal());
+
+        // Verificando e mapeando o animal, se existir
+        if (announcement.getAnimal() != null) {
+            AnnoucementDetailsAnimalAdoptionOutput animalOutput = modelMapper.map(
+                    announcement.getAnimal(), AnnoucementDetailsAnimalAdoptionOutput.class);
+            annoucementDetailsAdoptionOutput.setAnimal(animalOutput);
+        }
+
+        // Verificando e mapeando o tipo de anúncio, se existir
+        if (announcement.getAnnouncementType() != null) {
+            annoucementDetailsAdoptionOutput.setAnnouncementType(announcement.getAnnouncementType().getId());
+        }
+
+        // Verificando e adicionando o status ativo
+        annoucementDetailsAdoptionOutput.setActive(announcement.isActive());
+
+        // Verificando e mapeando as imagens, se existir
+        if (announcement.getImages() != null) {
+            List<ImageAnnouncementOutput> imageOutputs = announcement.getImages().stream()
+                    .map(image -> new ImageAnnouncementOutput(image.getId(), image.getImage()))
+                    .collect(Collectors.toList());
+            annoucementDetailsAdoptionOutput.setImages(imageOutputs.toString());
+        }
+
+        // Verificando e mapeando o endereço, se existir
+        if (announcement.getAddress() != null) {
+            AnnoucementDetailsAddressOutput addressOutput = modelMapper.map(
+                    announcement.getAddress(), AnnoucementDetailsAddressOutput.class);
+            annoucementDetailsAdoptionOutput.setAddress(addressOutput);
+        }
+
+        return annoucementDetailsAdoptionOutput;
+    }
+
+    public AnnoucementDetailsLostFoundOutput annoucementDetailsLostFound(Long id) {
+
+        Announcement announcement = announcementRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Anúncio não encontrado"));
+
+        // Inicializando o DTO
+        AnnoucementDetailsLostFoundOutput annoucementDetailsLostFoundOutput = new AnnoucementDetailsLostFoundOutput();
+        annoucementDetailsLostFoundOutput.setTitle(announcement.getTitle());
+        annoucementDetailsLostFoundOutput.setDescription(announcement.getDescription());
+        annoucementDetailsLostFoundOutput.setContactPhone(announcement.getContactPhone());
+        annoucementDetailsLostFoundOutput.setContactEmail(announcement.getContactEmail());
+
+        // Verificando e mapeando o animal, se existir
+        if (announcement.getAnimal() != null) {
+            AnnoucementDetailsAnimalLostFoundOutput animalOutput = modelMapper.map(
+                    announcement.getAnimal(), AnnoucementDetailsAnimalLostFoundOutput.class);
+            annoucementDetailsLostFoundOutput.setAnimal(animalOutput);
+        }
+
+        // Verificando e mapeando o tipo de anúncio, se existir
+        if (announcement.getAnnouncementType() != null) {
+            annoucementDetailsLostFoundOutput.setAnnouncementType(announcement.getAnnouncementType().getId());
+        }
+
+        // Verificando e adicionando o status ativo
+        annoucementDetailsLostFoundOutput.setActive(announcement.isActive());
+
+        // Verificando e mapeando as imagens, se existir
+        if (announcement.getImages() != null) {
+            List<ImageAnnouncementOutput> imageOutputs = announcement.getImages().stream()
+                    .map(image -> new ImageAnnouncementOutput(image.getId(), image.getImage()))
+                    .collect(Collectors.toList());
+            annoucementDetailsLostFoundOutput.setImages(imageOutputs.toString());
+        }
+
+        // Verificando e mapeando o endereço, se existir
+        if (announcement.getAddress() != null) {
+            AnnoucementDetailsAddressOutput addressOutput = modelMapper.map(
+                    announcement.getAddress(), AnnoucementDetailsAddressOutput.class);
+            annoucementDetailsLostFoundOutput.setAddress(addressOutput);
+        }
+
+        return annoucementDetailsLostFoundOutput;
+    }
+
 
     public List<AnnouncementOutput> findMyAnnouncements(Long userId) {
         List<Announcement> announcements = announcementRepository.findByUserId(userId);

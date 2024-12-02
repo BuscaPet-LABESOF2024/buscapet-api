@@ -95,7 +95,7 @@ public class AnnouncementController {
         return  ResponseEntity.ok(announcements);
     }
 
-    @GetMapping("/{id}")
+    /*@GetMapping("/{id}")
     public ResponseEntity<AnnouncementOutput> getAnnouncement(@PathVariable Long id) {
         Announcement announcement = announcementService.findById(id);
 
@@ -110,7 +110,37 @@ public class AnnouncementController {
         announcementDTO.setImages(imageDTOs); // Definindo a lista de imagens no DTO
 
         return ResponseEntity.ok(announcementDTO);
+    }*/
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> announcementDetails(@PathVariable Long id) {
+        Announcement announcement = announcementService.findById(id);
+
+        if (announcement == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Long announcementTypeId = announcement.getAnnouncementType().getId();
+        System.out.println("Announcement Type ID: " + announcementTypeId);
+
+        // Lógica específica para cada tipo de anúncio
+        return switch (announcementTypeId.intValue()) {
+            case 1 -> {
+                AnnoucementDetailsLostFoundOutput lostOutput = announcementService.annoucementDetailsLostFound(id);
+                yield ResponseEntity.ok(lostOutput); // DTO para perdido
+            }
+            case 2 -> {
+                AnnoucementDetailsLostFoundOutput foundOutput = announcementService.annoucementDetailsLostFound(id);
+                yield ResponseEntity.ok(foundOutput); // DTO para encontrado
+            }
+            case 3 -> {
+                AnnoucementDetailsAdoptionOutput adoptionOutput = announcementService.annoucementDetailsAdoption(id);
+                yield ResponseEntity.ok(adoptionOutput); // DTO para adoção
+            }
+            default -> ResponseEntity.badRequest().body("Tipo de anúncio desconhecido");
+        };
     }
+
 
     //BPET-49 listar os animais
     @GetMapping("/all-announcement") // Novo endpoint para obter todos os anúncios
