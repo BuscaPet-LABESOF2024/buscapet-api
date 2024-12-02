@@ -10,12 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +31,6 @@ public class AnnouncementService {
     private final AnnoucementTypeService annoucementTypeService;
     private final ImageAnnouncementService imageAnnouncementService;
     private final AddressService addressService;
-    private final JwtService jwtService;
 
     public AnnouncementService(AnnouncementRepository announcementRepository,
                                AnnouncementTypeRepository announcementTypeRepository,
@@ -52,18 +48,13 @@ public class AnnouncementService {
         this.annoucementTypeService = annoucementTypeService;
         this.imageAnnouncementService = imageAnnouncementService;
         this.addressService = addressService;
-        this.jwtService = jwtService;
     }
 
     public Page<AnnouncementOutput> findByFilters(SearchInput searchInput, Integer pageNumber, Integer size) {
         Pageable page = PageRequest.of(pageNumber, size, Sort.by(Sort.Order.desc("id")));
         Page<Announcement> announcements = announcementRepository.findAll(
                 byAnnouncementType(searchInput.getAnnouncementType())
-                        .and(byAnimalType(searchInput.getAnimalType()))
-                        .and(byAnimalBreed(searchInput.getAnimalBreed()))
-                        .and(byDate(searchInput.getDataInicial(), searchInput.getDataFinal()))
-                        .and(bySize(searchInput.getAnimalSize()))
-                        .and(byNeighborhood(searchInput.getNeighborhood())),
+                        .and(bySize(searchInput.getAnimalSize())),
                 page
         );
 
@@ -188,9 +179,16 @@ public class AnnouncementService {
     }
 
     public List<AnnouncementOutput> findAllAnnouncementsWithImages() {
-        List<Announcement> announcements = announcementRepository.findAll(); // Pega todos os anúncios
+        List<Announcement> announcements = announcementRepository.findAll(Sort.by(Sort.Order.desc("id"))); // Pega todos os anúncios
         return announcements.stream()
                 .map(this::convertToAnnouncementOutput) // Converte cada Announcement para AnnouncementOutput
+                .collect(Collectors.toList());
+    }
+
+    public List<AnnouncementOutput> findLastAnnouncementsWithImages() {
+        List<Announcement> announcements = announcementRepository.findLastAnnouncements();
+        return announcements.stream()
+                .map(this::convertToAnnouncementOutput)
                 .collect(Collectors.toList());
     }
 

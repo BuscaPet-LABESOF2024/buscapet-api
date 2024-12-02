@@ -90,7 +90,7 @@ public class AnnouncementController {
     @PostMapping("/search")
     public ResponseEntity<?> search(@RequestBody SearchInput searchInput,
                                     @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
-                                    @RequestParam(required = false, defaultValue = "8") Integer size) {
+                                    @RequestParam(required = false, defaultValue = "10") Integer size) {
         Page<AnnouncementOutput> announcements = announcementService.findByFilters(searchInput, pageNumber, size);
         return  ResponseEntity.ok(announcements);
     }
@@ -159,6 +159,12 @@ public class AnnouncementController {
     public ResponseEntity<List<AnnouncementOutput>> getMyAnnouncements(HttpServletRequest request) {
         Long userId = UserCredentials.getUserId(request);
         List<AnnouncementOutput> announcements = announcementService.findMyAnnouncements(userId);
+        return ResponseEntity.ok(announcements);
+    }
+
+    @GetMapping("/last-announcements")
+    public ResponseEntity<List<AnnouncementOutput>> getLastAnnouncements() {
+        List<AnnouncementOutput> announcements = announcementService.findLastAnnouncementsWithImages();
         return ResponseEntity.ok(announcements);
     }
 
