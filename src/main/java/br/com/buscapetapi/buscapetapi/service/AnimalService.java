@@ -35,24 +35,25 @@ public class AnimalService {
     }
 
     public Animal updateAnimal(AnimalInput animalInput) {
-        Optional<Animal> existingAnimal = animalRepository.findById(animalInput.getId());
+        // Busca o animal existente pelo ID, ou lança uma exceção se não encontrado
+        Animal existingAnimal = animalRepository.findById(animalInput.getId())
+                .orElseThrow(() -> new RuntimeException("Animal not found with ID: " + animalInput.getId()));
 
-        if (existingAnimal.isPresent()) {
-            Animal animal = existingAnimal.get();
+        // Atualiza os campos permitidos se não forem nulos
+        if (animalInput.getName() != null) existingAnimal.setName(animalInput.getName());
+        if (animalInput.getStatusAnimal() != 0) existingAnimal.setStatusAnimal(animalInput.getStatusAnimal());
+        if (animalInput.getType() != null) existingAnimal.setType(animalInput.getType());
+        if (animalInput.getBreed() != null) existingAnimal.setBreed(animalInput.getBreed());
+        if (animalInput.getSize() != null) existingAnimal.setSize(animalInput.getSize());
+        if (animalInput.getWeight() != null) existingAnimal.setWeight(animalInput.getWeight());
+        if (animalInput.getAge() != null) existingAnimal.setAge(animalInput.getAge());
 
-            animal.setName(animalInput.getName());
-            animal.setStatusAnimal(animalInput.getStatusAnimal());
-            animal.setType(animalInput.getType());
-            animal.setBreed(animalInput.getBreed());
-            animal.setSize(animalInput.getSize());
-            animal.setWeight(animalInput.getWeight());
-            animal.setAge(animalInput.getAge());
-            animal.setUpdatedAt(LocalDateTime.now());
+        existingAnimal.setUpdatedAt(LocalDateTime.now()); // Atualiza a data de modificação
 
-            return animalRepository.save(animal);
-        }
-        return null;
+        // Salva e retorna o animal atualizado
+        return animalRepository.save(existingAnimal);
     }
+
 
     public List<String> findAnnouncementsBreeds() {
         return animalRepository.findDistinctBreeds();

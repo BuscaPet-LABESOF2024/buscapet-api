@@ -81,11 +81,17 @@ public class AnnouncementController {
         return ResponseEntity.ok(output);
     }
 
-    @PutMapping("/update-announcement")
-    public ResponseEntity<Announcement> updateAnnouncement(@Valid @RequestBody Announcement announcementInput) {
-        Announcement updatedAnnouncement = announcementService.updateAnnouncement(announcementInput);
-        return ResponseEntity.ok(updatedAnnouncement);
+    @PutMapping("update-announcement")
+    public ResponseEntity<AnnouncementUpdateOutput> updateAnnouncement(
+            HttpServletRequest request,
+            @Valid @RequestBody AnnouncementUpdateInput announcementInput) {
+            System.out.println("Update Announcement");
+            announcementInput.setUserId(UserCredentials.getUserId(request));
+            // Chamando o serviço para atualizar o anúncio
+            AnnouncementUpdateOutput updatedAnnouncement = announcementService.updateAnnouncement(announcementInput);
+            return ResponseEntity.ok(updatedAnnouncement);
     }
+
 
     @PostMapping("/search")
     public ResponseEntity<?> search(@RequestBody SearchInput searchInput,

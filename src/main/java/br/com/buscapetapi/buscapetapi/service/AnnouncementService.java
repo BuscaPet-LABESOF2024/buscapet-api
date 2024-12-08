@@ -163,20 +163,41 @@ public class AnnouncementService {
     }
 
     //editar um anúncio task BPET-38
-    public Announcement updateAnnouncement(Announcement announcementInput) {
-        Optional<Announcement> existingAnnouncement = announcementRepository.findById(announcementInput.getId());
+    public AnnouncementUpdateOutput updateAnnouncement(AnnouncementUpdateInput announcementInput) {
+        // Busca o anúncio existente pelo ID
+        Announcement existingAnnouncement = announcementRepository.findById(announcementInput.getId())
+                .orElseThrow(() -> new RuntimeException("Announcement not found with ID: " + announcementInput.getId()));
 
-        if (existingAnnouncement.isPresent()) {
-            Announcement announcement = existingAnnouncement.get();
-            announcement.setTitle(announcementInput.getTitle());
-            announcement.setDescription(announcementInput.getDescription());
-            announcement.setContactEmail(announcementInput.getContactEmail());
-            announcement.setContactPhone(announcementInput.getContactPhone());
-            announcement.setUpdatedAt(LocalDateTime.now());
-            return announcementRepository.save(announcement);
+        // Atualiza os campos do anúncio com os dados de entrada
+        if (announcementInput.getTitle() != null) existingAnnouncement.setTitle(announcementInput.getTitle());
+        if (announcementInput.getDescription() != null) existingAnnouncement.setDescription(announcementInput.getDescription());
+        if (announcementInput.getData() != null) existingAnnouncement.setData(announcementInput.getData());
+        if (announcementInput.getContactPhone() != null) existingAnnouncement.setContactPhone(announcementInput.getContactPhone());
+        if (announcementInput.getAnnouncementType() != null) existingAnnouncement.setAnnouncementType(announcementInput.getAnnouncementType());
+        existingAnnouncement.setUpdatedAt(LocalDateTime.now());
+
+        // Atualiza associações se existirem
+        if (announcementInput.getAddress() != null) {
+            Address updatedAddress = modelMapper.map(announcementInput.getAddress(), Address.class);
+            updatedAddress.setId(existingAnnouncement.getAddress().getId());
+            updatedAddress = addressService.updateAddressGeral(updatedAddress);
+            existingAnnouncement.setAddress(updatedAddress);
         }
-        return null;
+
+        if (announcementInput.getAnimal() != null) {
+            AnimalInput updatedAnimal = announcementInput.getAnimal();
+            updatedAnimal.setId(existingAnnouncement.getAnimal().getId());
+            existingAnnouncement.setAnimal(animalService.updateAnimal(updatedAnimal));
+        }
+
+        // Salva o anúncio atualizado no repositório
+        Announcement updatedAnnouncement = announcementRepository.save(existingAnnouncement);
+
+        // Retorna a saída mapeada
+        return modelMapper.map(updatedAnnouncement, AnnouncementUpdateOutput.class);
     }
+
+
 
     public List<AnnouncementOutput> findAllAnnouncementsWithImages() {
         List<Announcement> announcements = announcementRepository.findAll(Sort.by(Sort.Order.desc("id"))); // Pega todos os anúncios
