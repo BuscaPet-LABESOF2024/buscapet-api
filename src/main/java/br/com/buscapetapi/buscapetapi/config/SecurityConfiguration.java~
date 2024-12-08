@@ -38,11 +38,17 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
+<<<<<<< Updated upstream
+                        .requestMatchers("/auth/**",
+                                "/announcement/last-announcements",
+                                "/api-docs"
+=======
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(
                                 "/v3/api-docs/**",    // Documentação OpenAPI
                                 "/swagger-ui/**",     // Recursos Swagger UI
                                 "/swagger-ui.html"    // Página principal Swagger UI
+>>>>>>> Stashed changes
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
