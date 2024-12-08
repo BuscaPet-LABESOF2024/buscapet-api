@@ -12,6 +12,7 @@ import java.util.List;
 
 @Repository
 public interface AnnouncementRepository extends JpaRepository<Announcement, Long>, JpaSpecificationExecutor<Announcement> {
+
     @Query("SELECT a FROM Announcement a ORDER BY a.createdAt DESC LIMIT 4")
     List<Announcement> findLastAnnouncements();
 

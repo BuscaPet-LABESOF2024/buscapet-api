@@ -38,8 +38,8 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(
+                        .requestMatchers("/auth/**",
+                                "/announcement/last-announcements",
                                 "/v3/api-docs/**",    // Documentação OpenAPI
                                 "/swagger-ui/**",     // Recursos Swagger UI
                                 "/swagger-ui.html"    // Página principal Swagger UI
@@ -60,7 +60,7 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(true);
+        //configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));

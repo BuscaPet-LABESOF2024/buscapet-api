@@ -83,6 +83,27 @@ public class AddressService {
         return modelMapper.map(address, AddressDataProfileOutput.class);
     }
 
+    public Address updateAddressGeral(Address updatedAddress) {
+        // Busca o endereço existente pelo ID, ou lança uma exceção se não encontrado
+        Address existingAddress = addressRepository.findById(updatedAddress.getId())
+                .orElseThrow(() -> new RuntimeException("Address not found with ID: " + updatedAddress.getId()));
+
+        // Atualiza os campos permitidos
+        if (updatedAddress.getStreet() != null) existingAddress.setStreet(updatedAddress.getStreet());
+        if (updatedAddress.getNumber() != 0) existingAddress.setNumber(updatedAddress.getNumber());
+        if (updatedAddress.getNeighborhood() != null) existingAddress.setNeighborhood(updatedAddress.getNeighborhood());
+        if (updatedAddress.getCep() != null) existingAddress.setCep(updatedAddress.getCep());
+        if (updatedAddress.getReferencia() != null) existingAddress.setReferencia(updatedAddress.getReferencia());
+        if (updatedAddress.getComplemento() != null) existingAddress.setComplemento(updatedAddress.getComplemento());
+
+        existingAddress.setUpdatedAt(LocalDateTime.now()); // Atualiza a data de modificação
+
+        // Salva e retorna o endereço atualizado
+        return addressRepository.save(existingAddress);
+    }
+
+
+
     public List<String> findAnnouncementsNeighborhoods() {
         return addressRepository.findDistinctNeighborhoods();
     }
