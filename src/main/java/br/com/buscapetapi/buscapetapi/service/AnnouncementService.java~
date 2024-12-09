@@ -275,7 +275,7 @@ public class AnnouncementService {
             List<ImageAnnouncementOutput> imageOutputs = announcement.getImages().stream()
                     .map(image -> new ImageAnnouncementOutput(image.getId(), image.getImage()))
                     .collect(Collectors.toList());
-            annoucementDetailsAdoptionOutput.setImages(imageOutputs);
+            annoucementDetailsAdoptionOutput.setImages(imageOutputs.toString());
         }
 
         // Verificando e mapeando o endereço, se existir
@@ -320,7 +320,7 @@ public class AnnouncementService {
             List<ImageAnnouncementOutput> imageOutputs = announcement.getImages().stream()
                     .map(image -> new ImageAnnouncementOutput(image.getId(), image.getImage()))
                     .collect(Collectors.toList());
-            annoucementDetailsLostFoundOutput.setImages(imageOutputs);
+            annoucementDetailsLostFoundOutput.setImages(imageOutputs.toString());
         }
 
         // Verificando e mapeando o endereço, se existir
