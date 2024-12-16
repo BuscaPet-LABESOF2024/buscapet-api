@@ -92,7 +92,6 @@ public class AnnouncementController {
             return ResponseEntity.ok(updatedAnnouncement);
     }
 
-
     @PostMapping("/search")
     public ResponseEntity<?> search(@RequestBody SearchInput searchInput,
                                     @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
@@ -130,6 +129,11 @@ public class AnnouncementController {
         };
     }
 
+    @PutMapping("/deactivate-announcement/{id}")
+    public ResponseEntity<Void> deactivateAnnouncement(@PathVariable Long id) {
+        announcementService.deactivateAnnouncement(id);
+        return ResponseEntity.noContent().build();
+    }
 
     //BPET-49 listar os animais
     @GetMapping("/all-announcement") // Novo endpoint para obter todos os anúncios
