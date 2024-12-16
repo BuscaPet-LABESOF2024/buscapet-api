@@ -1,10 +1,12 @@
 package br.com.buscapetapi.buscapetapi.service;
 
+import br.com.buscapetapi.buscapetapi.config.exception.UnauthorizedAccessException;
 import br.com.buscapetapi.buscapetapi.dto.input.*;
 import br.com.buscapetapi.buscapetapi.dto.output.*;
 import br.com.buscapetapi.buscapetapi.model.*;
 import br.com.buscapetapi.buscapetapi.repository.AnnouncementRepository;
 import br.com.buscapetapi.buscapetapi.repository.AnnouncementTypeRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -168,6 +170,11 @@ public class AnnouncementService {
         Announcement existingAnnouncement = announcementRepository.findById(announcementInput.getId())
                 .orElseThrow(() -> new RuntimeException("Announcement not found with ID: " + announcementInput.getId()));
 
+        // Verificar se o usuário autenticado é o dono do anúncio
+        if (!existingAnnouncement.getUser().getId().equals(announcementInput.getUserId())) {
+            throw new UnauthorizedAccessException("Usuário não autorizado a alterar este anúncio.");
+        }
+
         // Atualiza os campos do anúncio com os dados de entrada
         if (announcementInput.getTitle() != null) existingAnnouncement.setTitle(announcementInput.getTitle());
         if (announcementInput.getDescription() != null) existingAnnouncement.setDescription(announcementInput.getDescription());
@@ -197,7 +204,16 @@ public class AnnouncementService {
         return modelMapper.map(updatedAnnouncement, AnnouncementUpdateOutput.class);
     }
 
-
+    public void deactivateAnnouncement(Long id) {
+        Optional<Announcement> announcement = announcementRepository.findById(id);
+        if (announcement.isPresent()) {
+            Announcement ad = announcement.get();
+            ad.setActive(false);  // Marca o anúncio como inativo
+            announcementRepository.save(ad);  // Salva a alteração no banco de dados
+        } else {
+            throw new EntityNotFoundException("Anúncio não encontrado.");
+        }
+    }
 
     public List<AnnouncementOutput> findAllAnnouncementsWithImages() {
         List<Announcement> announcements = announcementRepository.findAll(Sort.by(Sort.Order.desc("id"))); // Pega todos os anúncios
@@ -248,6 +264,7 @@ public class AnnouncementService {
 
         // Inicializando o DTO
         AnnoucementDetailsAdoptionOutput annoucementDetailsAdoptionOutput = new AnnoucementDetailsAdoptionOutput();
+        annoucementDetailsAdoptionOutput.setId(announcement.getId());
         annoucementDetailsAdoptionOutput.setTitle(announcement.getTitle());
         annoucementDetailsAdoptionOutput.setDescription(announcement.getDescription());
         annoucementDetailsAdoptionOutput.setContactPhone(announcement.getContactPhone());
@@ -295,6 +312,7 @@ public class AnnouncementService {
 
         // Inicializando o DTO
         AnnoucementDetailsLostFoundOutput annoucementDetailsLostFoundOutput = new AnnoucementDetailsLostFoundOutput();
+        annoucementDetailsLostFoundOutput.setId(announcement.getId());
         annoucementDetailsLostFoundOutput.setTitle(announcement.getTitle());
         annoucementDetailsLostFoundOutput.setDescription(announcement.getDescription());
         annoucementDetailsLostFoundOutput.setContactPhone(announcement.getContactPhone());
@@ -328,6 +346,10 @@ public class AnnouncementService {
             AnnoucementDetailsAddressOutput addressOutput = modelMapper.map(
                     announcement.getAddress(), AnnoucementDetailsAddressOutput.class);
             annoucementDetailsLostFoundOutput.setAddress(addressOutput);
+        }
+
+        if(announcement.getData() != null) {
+            annoucementDetailsLostFoundOutput.setData(announcement.getData());
         }
 
         return annoucementDetailsLostFoundOutput;

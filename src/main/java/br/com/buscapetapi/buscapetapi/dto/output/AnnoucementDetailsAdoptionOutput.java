@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class AnnoucementDetailsAdoptionOutput {
+    private Long id;
     private String title;
     private String description;
     private String contactPhone;
