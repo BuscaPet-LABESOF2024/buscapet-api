@@ -148,6 +148,7 @@ public class AnnouncementController {
 
         return ResponseEntity.ok(types);
     }
+
     @GetMapping("/my-announcements")
     public ResponseEntity<List<AnnouncementOutput>> getMyAnnouncements(HttpServletRequest request) {
         Long userId = UserCredentials.getUserId(request);

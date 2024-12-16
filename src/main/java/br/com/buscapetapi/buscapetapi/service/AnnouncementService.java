@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -52,19 +53,23 @@ public class AnnouncementService {
         this.addressService = addressService;
     }
 
+    public static Specification<Announcement> isActive() {
+        return (root, query, builder) -> builder.isTrue(root.get("active"));
+    }
+
+
     public Page<AnnouncementOutput> findByFilters(SearchInput searchInput, Integer pageNumber, Integer size) {
         Pageable page = PageRequest.of(pageNumber, size, Sort.by(Sort.Order.desc("id")));
         Page<Announcement> announcements = announcementRepository.findAll(
                 byAnnouncementType(searchInput.getAnnouncementType())
-                        .and(bySize(searchInput.getAnimalSize())),
+                        .and(bySize(searchInput.getAnimalSize()))
+                        .and(isActive()),
                 page
         );
 
         // Mapeando os resultados para AnnouncementOutput usando modelMapper
         return announcements.map(announcement -> modelMapper.map(announcement, AnnouncementOutput.class));
     }
-
-
 
     public Announcement createAnnouncement(Announcement announcementInput) {
         announcementInput.setCreatedAt(LocalDateTime.now());
@@ -86,6 +91,7 @@ public class AnnouncementService {
         announcement.setContactEmail(user.getEmail());
         announcement.setCreatedAt(LocalDateTime.now());
         announcement.setUpdatedAt(LocalDateTime.now());
+        announcement.setActive(true);
 
         Announcement createdAnnouncement = announcementRepository.save(announcement);
 
@@ -216,7 +222,8 @@ public class AnnouncementService {
     }
 
     public List<AnnouncementOutput> findAllAnnouncementsWithImages() {
-        List<Announcement> announcements = announcementRepository.findAll(Sort.by(Sort.Order.desc("id"))); // Pega todos os anúncios
+        List<Announcement> announcements = announcementRepository.findActive(Sort.by(Sort.Order.desc("id"))); // Pega todos os anúncios
+        announcements.forEach(a -> System.out.println("Announcement ID: " + a.getId() + ", Active: " + a.isActive()));
         return announcements.stream()
                 .map(this::convertToAnnouncementOutput) // Converte cada Announcement para AnnouncementOutput
                 .collect(Collectors.toList());
